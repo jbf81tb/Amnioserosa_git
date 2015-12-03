@@ -12,8 +12,16 @@ function fxyc_struct = fxyc_to_struct(fxyc)
             fxyc_struct(i).ypos = fxyc(during,3,j);
             fxyc_struct(i).class = fxyc(1,4,j);
             fxyc_struct(i).int = fxyc(during,5,j);
+            if any(fxyc_struct(i).int==0)
+                fixed = fxyc_struct(i).int~=0;
+                fxyc_struct(i).frame = fxyc_struct(i).frame(fixed);
+                fxyc_struct(i).xpos = fxyc_struct(i).xpos(fixed);
+                fxyc_struct(i).ypos = fxyc_struct(i).ypos(fixed);
+                fxyc_struct(i).int = fxyc_struct(i).int(fixed);
+            end
             if isempty(fxyc_struct(i).frame)
-                fxyc_struct(i).lt = 0;
+                fxyc_struct(i) = [];
+                i = i-1;
                 continue;
             end
             fxyc_struct(i).lt = fxyc_struct(i).frame(end)-fxyc_struct(i).frame(1)+1;
