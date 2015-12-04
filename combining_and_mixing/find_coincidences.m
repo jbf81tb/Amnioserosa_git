@@ -10,9 +10,12 @@ x_tot = mov_sz(2);
 fprintf('Percent Complete (Coincidence Finding): %3i%%',0);
 
 for sec = 1:sst(1)
-    pri = primes((2*sum(lst(sec,:)))^(1.05));
+    pri = primes((2*sum(lst(sec,:)))^(1.2));
     pri = pri(1:sum(lst(sec,:)));
-    num_tr_st = [0, lst(sec,1), lst(sec,1)+lst(sec,2)];
+    num_tr_st = zeros(1,sst(2));
+    for i = 2:sst(2)
+        num_tr_st(i) = num_tr_st(i-1) + lst(sec,i-1);
+    end
     for st = 1:sst(2)
         xpos = {structs{sec,st}.xpos};
         ypos = {structs{sec,st}.ypos};
@@ -45,6 +48,7 @@ for sec = 1:sst(1)
             end
             mask{sec,st,fr} = zeros(y_tot,x_tot);
             ind_mask{sec,st,fr} = ones(y_tot,x_tot);
+            if isempty(isframe{fr}), continue; end
             for i = 1:length(allx)
                 mask{sec,st,fr}(ceil(ally(i)),ceil(allx(i))) = 1;
                 ind_mask{sec,st,fr}(ceil(ally(i)),ceil(allx(i))) = pind(i);

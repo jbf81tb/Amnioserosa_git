@@ -12,6 +12,7 @@ else
     l = 1;
     for fr = 1:ml
         int = [0, 0, 0];
+        rI = 0; I = 0;
         for j = 1:lct
             fr_ind = find(comb.trace(j).frame == fr);
             if isempty(fr_ind), continue; end
@@ -20,13 +21,15 @@ else
                 int(2) = j;
                 int(3) = fr_ind;
             end
+            rI = rI + comb.trace(j).st(fr_ind)*comb.trace(j).int(fr_ind);
+            I = I + comb.trace(j).int(fr_ind);
         end
         if int(1) == 0, continue; end
         mixed.frame(l) = fr;
         mixed.int(l) = int(1);
         mixed.xpos(l) = comb.trace(int(2)).xpos(int(3));
         mixed.ypos(l) = comb.trace(int(2)).ypos(int(3));
-        mixed.st(l) = comb.trace(int(2)).st(int(3));
+        mixed.st(l) = rI/I;
         lvl(l) = comb.lvl(int(2)); %#ok<AGROW>
         ind(l) = comb.ind(int(2)); %#ok<AGROW>
         if isempty(comb.trace(int(2)).coin), continue; end

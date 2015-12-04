@@ -18,7 +18,7 @@ for i = 1:length(ints)
     end
     for j = (rear+1):lint
         sub = (max(1,j-rear):min(lint,(j+front)));
-        curmax = max(int(sub))-bkgrd; %%%%%%%%%%%%%%% check
+        curmax = max(int)-bkgrd; %%%%%%%%%%%%%%% check
         tmp = (int(sub)-bkgrd)/curmax;
         tmpx = sub*frame_rate;
         tmpy = tmp';

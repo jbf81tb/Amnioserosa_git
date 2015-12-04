@@ -11,6 +11,7 @@ if ~isstruct(structs{1,1})
     fprintf('complete.\n');
 end
 structs = find_coincidences(structs,mov_sz);
+save tmp.mat structs
 for sec = 1:sst(1)
     ord = gen_ord(sst(2));
     for o = ord
@@ -33,16 +34,20 @@ for sec = 1:sst(1)
         end
         fprintf('mixed.\n');
     end
+    save tmp.mat structs
     fprintf('Fixing self coincidence... ');
     structs{sec, ord(end)} = find_and_fix_self_coincidence(structs{sec, ord(end)},mov_sz);
     fprintf('complete.\n');
+    save tmp.mat structs
     fprintf('Cleaning structs and finding slopes... %3i%%',0);
     for st = 1:sst(2)
         tmpl = cellfun(@isempty,{structs{sec,st}.frame});
         structs{sec,st}(tmpl) = [];
-        structs{sec,st} = slope_finding(structs{sec,st});
+        structs{sec,st} = slope_finding(structs{sec,st},1,400);
         fprintf('\b\b\b\b%3i%%',ceil(100*st/sst(2)));
     end
     fprintf('\b\b\b\bcomplete.\n');
+    save tmp.mat structs
 end
+delete tmp.mat
 end
