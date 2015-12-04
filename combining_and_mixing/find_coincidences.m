@@ -10,7 +10,7 @@ x_tot = mov_sz(2);
 fprintf('Percent Complete (Coincidence Finding): %3i%%',0);
 
 for sec = 1:sst(1)
-    pri = primes(10^7);
+    pri = primes((2*sum(lst(sec,:)))^(1.05));
     pri = pri(1:sum(lst(sec,:)));
     num_tr_st = [0, lst(sec,1), lst(sec,1)+lst(sec,2)];
     for st = 1:sst(2)
