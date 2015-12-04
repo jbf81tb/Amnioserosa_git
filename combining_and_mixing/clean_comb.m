@@ -1,5 +1,5 @@
-function ccomb = clean_comb(comb)
-if length(comb.trace) == 1, ccomb = comb; return; end
+function comb = clean_comb(comb)
+if length(comb.trace) == 1, return; end
 dist = zeros(length(comb.trace),1);
 num = zeros(length(comb.trace),1);
 for fr = comb.trace(1).frame'
@@ -20,5 +20,4 @@ d(1) = false;
 comb.trace(d) = [];
 comb.lvl(d) = [];
 comb.ind(d) = [];
-ccomb = comb;
 end
