@@ -5,7 +5,7 @@ ymax = ceil(max(cellfun(@max,{st.ypos})));
 xmax = ceil(max(cellfun(@max,{st.xpos})));
 nt = length(st);
 % imsec = length(window);
-img = zeros(ymax,xmax,1201,'uint16');
+img = zeros(ymax,xmax,ml,'uint16');
 slopes = cell(ymax,xmax);
 lts = cell(ymax,xmax);
 fprintf('Percent Complete: %3u%%',0);
@@ -31,8 +31,8 @@ fprintf('\b\b\b\b%3u%%',ceil(100*i/nt));
 end
 fprintf('\b\b\b\b%3u%%\n',100);
 %%
-zeros(ymax,xmax,1001);
-for i = 101:1101
+B = zeros(ymax,xmax,ml-200);
+for i = 101:ml-100
 % sd = 10;
 % B(:,:,i) = imgaussfilt(img(:,:,i),sd);
 B(:,:,i-100) = imfilter(sum(img(:,:,i-100:i+100),3),fspecial('disk',10));
@@ -42,6 +42,9 @@ if exist('tmp','dir'), rmdir('tmp','s'); end
 mkdir('tmp');
 prom = .5; wid = 80;
 pks = zeros(size(B),'uint16');
+close
+figure
+axes('units','pixels','position',[100 100 ymax xmax]);
 for k = 1:size(B,3)
 totes = B(:,:,k);
 [~,locs] = findpeaks(totes(:),'minpeakprominence',prom,'minpeakdistance',wid);
@@ -63,9 +66,6 @@ for i = 1:length(locs)
 end
 pks(:,:,k) = pks1+pks2;
 
-close
-figure
-axes('units','pixels','position',[100 100 ymax xmax]);
 % subplot(1,2,1)
 totes = totes';
 imagesc(totes)
@@ -73,9 +73,9 @@ hold on
 plot(c1,r1,'kx')
 plot(r2,c2,'kx')
 axis off
-F = getframe(gcf,[99 99 ymax xmax]);
-imwrite(F.cdata,fullfile('tmp',sprintf('%04u.tif',k)),'tif')
-% % pause
+% F = getframe(gcf,[99 99 ymax xmax]);
+% imwrite(F.cdata,fullfile('tmp',sprintf('%04u.tif',k)),'tif')
+pause(1/30)
 % % close
 % % figure
 % subplot(1,2,2)
