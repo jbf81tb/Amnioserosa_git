@@ -1,4 +1,4 @@
-st = nsta;
+st = osta;
 % window = [76,260;260,436;436,684;684,925;925,1107;1107,1277]-75;
 ml = max(cellfun(@max,{st.frame}));
 ymax = ceil(max(cellfun(@max,{st.ypos})));
