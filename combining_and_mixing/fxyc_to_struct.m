@@ -1,5 +1,6 @@
 function fxyc_struct = fxyc_to_struct(fxyc)
-%also does gap filling and removes empty traces
+%FXYC_TO_STRUCT Converts Threshfxyc to a structure.
+%   also does gap filling and removes empty traces
         fxyc_struct = struct('frame',[],'xpos',[],'ypos',[],'class',0,'int',[]);
         i = 0;
         for j = 1:size(fxyc,3)

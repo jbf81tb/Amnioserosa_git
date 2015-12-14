@@ -14,13 +14,14 @@ fprintf('\b\b\b\b%3u%%\n',100);
 %%
 int = zeros(1,length(nsta));
 for i = 1:length(nsta)
-    int(i) = sum(nsta(i).int./int_sum(nsta(i).frame)')/nsta(i).lt;
+%     int(i) = sum(nsta(i).int./int_sum(nsta(i).frame)')/nsta(i).lt;
+    int(i) = max(nsta(i).int./int_sum(nsta(i).frame)');
 end
 %%
 % int = cellfun(@sum,{nsta.int})./[nsta.lt];
 [~, tmpi] = sort(int,'descend');
 good = false(1,length(nsta));
-good(tmpi(1:ceil(2*end/100))) = true;
+good(tmpi(1:ceil(end/100))) = true;
 % [hy,hx] = hist(int,1000);
 % shy = zeros(1,length(hy));
 % shy(1) = hy(1)/sum(hy);

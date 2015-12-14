@@ -1,5 +1,6 @@
-function structs = combining_and_mixing(structs,mov_sz)
+function structs = combining_and_mixing(structs,filename)
 global ord sec
+mov_sz = [size(imread(filename)) length(imfinfo(filename))/(length(structs)+1)];
 sst = size(structs);
 if ~isstruct(structs{1,1})
     fprintf('Making structs... ');
@@ -43,7 +44,7 @@ for sec = 1:sst(1)
     for st = 1:sst(2)
         tmpl = cellfun(@isempty,{structs{sec,st}.frame});
         structs{sec,st}(tmpl) = [];
-        structs{sec,st} = slope_finding(structs{sec,st},1,400);
+        structs{sec,st} = slope_finding(structs{sec,st},3,400);
         fprintf('\b\b\b\b%3i%%',ceil(100*st/sst(2)));
     end
     fprintf('\b\b\b\bcomplete.\n');
