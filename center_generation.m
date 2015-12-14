@@ -1,4 +1,5 @@
 F = @(A1,x01,s1,A2,x02,s2,x)(A1*exp(-(x-x01).^2/(2*s1^2))+A2*exp(-(x-x02).^2/(2*s2^2)));
+ml = max(cellfun(@max,{nsta.frame}));
 fit_returns_a = zeros(ml,4);
 for fr = 1:ml
     xp = []; yp = []; zp = [];
@@ -35,7 +36,6 @@ ylim([1,21])
 mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
 mov_sz = [size(imread(mov_nm)), length(imfinfo(mov_nm))];
 sum_img = zeros(mov_sz);
-if exist(filename,'file'), delete(filename); end
 for fr = 1:mov_sz(3)
     tmp = zeros([mov_sz(1:2) range(mid(fr))+1],'uint16');
     for i = mid(fr)'
@@ -64,6 +64,6 @@ for fr = 1:length(imfinfo(mov_nm))
     frame_img = imread([mov_nm(1:end-5) num2str(mid(fr)+1) '.tif'],fr);
 %     dots = uint16(conv2(cent_map{fr},ones(3),'same'));
     dots = uint16(cent_map{fr});
-    tmp = frame_img - frame_img.*dots + (2^16-1)*dots;
+    tmp = frame_img - frame_img.*dots + intmax('uint16')*dots;
     imwrite(uint16(tmp),filename,'writemode','append')
 end

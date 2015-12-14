@@ -74,7 +74,7 @@ ax = (ax(1:end-1)+ax(2:end))/2;
 %%
 close
 figure
-plot(bax,bay/sum(bay),'b',apx,apy/sum(apy),'r',bx,by/sum(by),'g',ax,ay/sum(ay),'k')
+plot(bax,bay/sum(bay),'b',apx,apy/sum(apy),'r',ax,ay/sum(ay),'k')%,bx,by/sum(by),'g')
 title('blue = basal | red = apical | green = blobs | black = everything')
 %%
 close
