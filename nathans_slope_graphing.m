@@ -1,15 +1,21 @@
-function [nathan, near] = nathans_slope_graphing(fxyc_struct)
-xpos = {fxyc_struct.xpos};
-ypos = {fxyc_struct.ypos};
-frames = {fxyc_struct.frame};
-slopes = cellfun(@times,{fxyc_struct.sl},cellfun(@lt,{fxyc_struct.sl},repmat({0},[1 length({fxyc_struct.sl})]),'uniformoutput',false),'uniformoutput',false);
-nzslp = cellfun(@nonzeros,slopes,'uniformoutput',false);
-nzslpv = vertcat(nzslp{:});
+function [nathan, near] = nathans_slope_graphing(fxyc_struct,varargin)
+if nargin==1
+    good = true(1,length(fxyc_struct));
+else
+    good = varargin{1};
+end
+xpos = {fxyc_struct(good).xpos};
+ypos = {fxyc_struct(good).ypos};
+frames = {fxyc_struct(good).frame};
+slopes = {fxyc_struct(good).sl};
+% slopes = cellfun(@times,{fxyc_struct(good).sl},cellfun(@lt,{fxyc_struct(good).sl},repmat({0},[1 length({fxyc_struct.sl})]),'uniformoutput',false),'uniformoutput',false);
+% nzslp = cellfun(@nonzeros,slopes,'uniformoutput',false);
+% nzslpv = vertcat(nzslp{:});
 % medsl = median(nzslpv);
-ml = 100;
+ml = 86;
 nn = 10;
 exp_val = 1.1;
-[ymax, xmax] = size(imread('good_amneo.tif'));
+[ymax, xmax] = size(imread('max_proj.tif'));
 nathan = cell(ml,1);
 near = cell(ml,1);
 
@@ -47,7 +53,7 @@ for fr = 1:ml
 %                     sd(1) = []; 
 %                     sdi(1) = []; 
 %                 end
-                tmpsl = slp(sdi);
+                tmpsl = abs(slp(sdi));
                 cond = tmpsl~=0;
 %                 tmpsl(cond) = 2*medsl - tmpsl(cond);
                 nathan{fr}(y,x) = sum(tmpsl(cond)./(exp_val.^(sd(cond))))/sum(1./exp_val.^(sd(cond)));

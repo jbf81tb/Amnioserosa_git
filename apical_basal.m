@@ -20,7 +20,7 @@ for fr = 3:ml-2
         for j = 1:4
             cond = yp>(i-1)*128+1 & yp<=i*128&...
                     xp>(j-1)*128+1 & xp<=j*128;
-            subplot(4,4,(i-1)*4+j)
+%             subplot(4,4,(i-1)*4+j)
             [hy,tmp] = histcounts(zp(cond),0:1:21);
             hx = (tmp(1:end-1)+tmp(2:end))/2;
             f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1]);
@@ -29,7 +29,7 @@ for fr = 3:ml-2
             fit_returns(i,j,fr,2) = tmpval(3);
             fit_returns(i,j,fr,3) = tmpval(5);
             fit_returns(i,j,fr,4) = tmpval(6);
-            plot(f,hx,hy)
+%             plot(f,hx,hy)
         end
     end
 %     set(fh,'name',num2str(fr));
