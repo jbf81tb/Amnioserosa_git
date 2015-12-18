@@ -159,8 +159,8 @@ bads = isnan(vec);
 if ~any(bads), return; end
 fg = find(~bads,1,'first');
 lg = find(~bads,1,'last');
-% vec(1:fg-1) = vec(fg);
-% vec(lg+1:end) = vec(lg);
+vec(1:fg-1) = vec(fg);
+vec(lg+1:end) = vec(lg);
 i = fg;
 while i <= lg
     if ~bads(i), i = i+1; continue; end

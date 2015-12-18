@@ -1,6 +1,7 @@
 F = @(A1,x01,s1,A2,x02,s2,x)(A1*exp(-(x-x01).^2/(2*s1^2))+A2*exp(-(x-x02).^2/(2*s2^2)));
 ml = max(cellfun(@max,{nsta.frame}));
 fit_returns_a = zeros(ml,4);
+fprintf('Percent Complete: %3u%%',0);
 for fr = 1:ml
     xp = []; yp = []; zp = [];
     for i = 1:length(nsta)
@@ -18,8 +19,10 @@ for fr = 1:ml
     fit_returns_a(fr,2) = tmpval(3);
     fit_returns_a(fr,3) = tmpval(5);
     fit_returns_a(fr,4) = tmpval(6);
+    fprintf('\b\b\b\b%3u%%',ceil(100*fr/ml));
 end
 mid = round((fit_returns_a(:,1)+fit_returns_a(:,3))/2);
+fprintf('\b\b\b\b%3u%%\n',100);
 %%
 close
 figure
@@ -33,7 +36,7 @@ plot(squeeze(fit_returns_a(:,3))-squeeze(fit_returns_a(:,4)),'r--')
 title('blue = apical | red = basal')
 ylim([1,21])
 %%
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
+mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\orig_movies\Section_1_Stack_1.tif';
 mov_sz = [size(imread(mov_nm)), length(imfinfo(mov_nm))];
 sum_img = zeros(mov_sz);
 for fr = 1:mov_sz(3)
@@ -58,7 +61,7 @@ for fr = 1:mov_sz(3)
 end
 %%
 filename = 'centers_proj.tif';
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
+mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\orig_movies\Section_1_Stack_1.tif';
 if exist(filename,'file'), delete(filename); end
 for fr = 1:length(imfinfo(mov_nm))
     frame_img = imread([mov_nm(1:end-5) num2str(mid(fr)+1) '.tif'],fr);

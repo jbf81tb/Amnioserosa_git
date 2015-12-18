@@ -20,8 +20,8 @@ end
 %%
 % int = cellfun(@sum,{nsta.int})./[nsta.lt];
 [~, tmpi] = sort(int,'descend');
-good = false(1,length(nsta));
-good(tmpi(1:ceil(end/100))) = true;
+blob = false(1,length(nsta));
+blob(tmpi(1:ceil(end/100))) = true;
 % [hy,hx] = hist(int,1000);
 % shy = zeros(1,length(hy));
 % shy(1) = hy(1)/sum(hy);
@@ -38,7 +38,7 @@ for fr = 1:mov_sz(3)
     tmp = double(imread(mpname,'index',fr))/(2^16-1);
     img = cat(3,tmp,tmp,tmp);
     for i = 1:length(nsta)
-        if ~good(i), continue; end
+        if ~blob(i), continue; end
         fr_ind = find(nsta(i).frame == fr);
         xpos = ceil(nsta(i).xpos(fr_ind));
         ypos = ceil(nsta(i).ypos(fr_ind));

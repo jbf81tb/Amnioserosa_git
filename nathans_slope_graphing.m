@@ -8,6 +8,10 @@ xpos = {fxyc_struct(good).xpos};
 ypos = {fxyc_struct(good).ypos};
 frames = {fxyc_struct(good).frame};
 slopes = {fxyc_struct(good).sl};
+mnslp = min(cellfun(@min,slopes));
+for i = 1:length(slopes)
+    slopes{i} = slopes{i} - mnslp;
+end
 % slopes = cellfun(@times,{fxyc_struct(good).sl},cellfun(@lt,{fxyc_struct(good).sl},repmat({0},[1 length({fxyc_struct.sl})]),'uniformoutput',false),'uniformoutput',false);
 % nzslp = cellfun(@nonzeros,slopes,'uniformoutput',false);
 % nzslpv = vertcat(nzslp{:});
@@ -53,7 +57,7 @@ for fr = 1:ml
 %                     sd(1) = []; 
 %                     sdi(1) = []; 
 %                 end
-                tmpsl = abs(slp(sdi));
+                tmpsl = slp(sdi);
                 cond = tmpsl~=0;
 %                 tmpsl(cond) = 2*medsl - tmpsl(cond);
                 nathan{fr}(y,x) = sum(tmpsl(cond)./(exp_val.^(sd(cond))))/sum(1./exp_val.^(sd(cond)));
