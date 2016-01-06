@@ -1,6 +1,6 @@
-function structs = combining_and_mixing(structs,filename)
+function structs = combining_and_mixing(structs,mp_filename,frame_length,thresh)
 global ord sec
-mov_sz = [size(imread(filename)) length(imfinfo(filename))/(length(structs)+1)];
+mov_sz = [size(imread(mp_filename)) length(imfinfo(mp_filename))];
 sst = size(structs);
 if ~isstruct(structs{1,1})
     fprintf('Making structs... ');
@@ -14,11 +14,12 @@ end
 structs = find_coincidences(structs,mov_sz);
 save tmp.mat structs
 for sec = 1:sst(1)
-    ord = gen_ord(sst(2));
+    nps = sum(~cellfun(@isempty,structs(sec,:)));
+    ord = gen_ord(nps);
     for o = ord
     fprintf('Section %i, Stack %i is... ',sec,o);
-        fxyc = cell(sst(2),1);
-        for st = 1:sst(2)
+        fxyc = cell(nps,1);
+        for st = 1:nps
             fxyc{st} = structs{sec,st};
         end
         n = 2-mod(find(o==ord),2);
@@ -40,14 +41,13 @@ for sec = 1:sst(1)
     structs{sec, ord(end)} = find_and_fix_self_coincidence(structs{sec, ord(end)},mov_sz);
     fprintf('complete.\n');
     save tmp.mat structs
-    fprintf('Cleaning structs and finding slopes... %3i%%',0);
-    for st = 1:sst(2)
+    fprintf('Cleaning structs and finding slopes... ');
+    for st = 1:nps
         tmpl = cellfun(@isempty,{structs{sec,st}.frame});
         structs{sec,st}(tmpl) = [];
-        structs{sec,st} = slope_finding(structs{sec,st},3,400);
-        fprintf('\b\b\b\b%3i%%',ceil(100*st/sst(2)));
+        structs{sec,st} = slope_finding(structs{sec,st},frame_length,thresh);
     end
-    fprintf('\b\b\b\bcomplete.\n');
+    fprintf('complete.\n');
     save tmp.mat structs
 end
 delete tmp.mat

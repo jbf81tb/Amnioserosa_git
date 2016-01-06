@@ -16,7 +16,7 @@ for i = 1:length(ints)
         fxyc_struct(i).sl = intdif;
         continue;
     end
-    for j = (rear+1):lint
+    for j = (rear+1):(lint-front)
         sub = (max(1,j-rear):min(lint,(j+front)));
         curmax = max(int)-bkgrd; %%%%%%%%%%%%%%% check
         tmp = (int(sub)-bkgrd)/curmax;

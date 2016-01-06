@@ -12,11 +12,12 @@ fprintf('Percent Complete (Coincidence Finding): %3i%%',0);
 for sec = 1:sst(1)
     pri = primes((2*sum(lst(sec,:)))^(1.2));
     pri = pri(1:sum(lst(sec,:)));
-    num_tr_st = zeros(1,sst(2));
-    for i = 2:sst(2)
+    nps = sum(~cellfun(@isempty,structs(sec,:)));
+    num_tr_st = zeros(1,nps);
+    for i = 2:nps
         num_tr_st(i) = num_tr_st(i-1) + lst(sec,i-1);
     end
-    for st = 1:sst(2)
+    for st = 1:nps
         xpos = {structs{sec,st}.xpos};
         ypos = {structs{sec,st}.ypos};
         frames = {structs{sec,st}.frame};
@@ -74,6 +75,8 @@ for sec = 1:sst(1)
                         tmp = sort(factor2(img(B{i}(1,1),B{i}(1,2)),pri));
                     elseif size(B{i},1)==3
                         tmp = sort([img(B{i}(1,1),B{i}(1,2)),img(B{i}(2,1),B{i}(2,2))]);
+                    else
+                        continue;
                     end
                     pinds{sec,st-1,fr}(i,1) = find(tmp(1)==pri)-num_tr_st(st-1);
                     pinds{sec,st-1,fr}(i,2) = find(tmp(2)==pri)-num_tr_st(st);

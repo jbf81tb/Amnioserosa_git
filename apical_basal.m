@@ -4,6 +4,7 @@ clear img
 zpa = [];
 close
 fh = figure;
+ah = tight_subplot(8,8,.005,[0 .02],.005);
 for fr = 3:ml-2
     xp = []; yp = []; zp = [];
     for i = 1:length(nsta)
@@ -16,20 +17,23 @@ for fr = 3:ml-2
 %     rp = sqrt(xp.^2 + yp.^2);
 %     tp = atan(yp./xp);
 %     zpa = [zpa, zp(cond)];
-    for i = 1:4
-        for j = 1:4
-            cond = yp>(i-1)*128+1 & yp<=i*128&...
-                    xp>(j-1)*128+1 & xp<=j*128;
-            subplot(4,4,(i-1)*4+j)
+    for i = 1:8
+        for j = 1:8
+            cond = yp>(i-1)*64+1 & yp<=i*64&...
+                    xp>(j-1)*64+1 & xp<=j*64;
+%             subplot(8,8,(i-1)*8+j)
+            axes(ah((i-1)*8+j))
             [hy,tmp] = histcounts(zp(cond),0:1:21);
             hx = (tmp(1:end-1)+tmp(2:end))/2;
-            f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1]);
+            f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1],'lower',[min(hy),1,.5,min(hy),1,.5],'upper',[1.5*max(hy),21,3,max(hy),21,4]);
             tmpval = coeffvalues(f);
             fit_returns(i,j,fr,1) = tmpval(2); 
             fit_returns(i,j,fr,2) = tmpval(3);
             fit_returns(i,j,fr,3) = tmpval(5);
             fit_returns(i,j,fr,4) = tmpval(6);
             plot(f,hx,hy)
+            legend off
+            axis off
         end
     end
     set(fh,'name',num2str(fr));
@@ -46,10 +50,10 @@ end
 basal = false(1,length(nsta));
 apical = false(1,length(nsta));
 for i = 1:length(nsta)
-    quadx = ceil(mean(nsta(i).xpos)/128);
-    quady = ceil(mean(nsta(i).ypos)/128);
+    quadx = ceil(mean(nsta(i).xpos)/64);
+    quady = ceil(mean(nsta(i).ypos)/64);
     mnz = mean(nsta(i).st);
-    fr = ceil(nsta(i).frame);
+    fr = ceil(mean(nsta(i).frame));
     if abs(mnz-fit_returns(quady,quadx,fr,1))<fit_returns(quady,quadx,fr,2)
         apical(i) = true;
     elseif abs(mnz-fit_returns(quady,quadx,fr,3))<2*fit_returns(quady,quadx,fr,2)
@@ -71,6 +75,17 @@ bx = (bx(1:end-1)+bx(2:end))/2;
 nbx = (nbx(1:end-1)+nbx(2:end))/2;
 [ay,ax] = histcounts(nonzeros(cell2mat({nsta.sl}')),vec);
 ax = (ax(1:end-1)+ax(2:end))/2;
+%%
+vec = 0:3:200;
+close
+figure
+% [baly,balx] = histcounts(3*[nsta(basal&~blob).lt],vec);
+histogram(3*[nsta(basal&~blob).lt],vec,'normalization','pdf');
+% balx = (balx(1:end-1)+balx(2:end))/2;
+figure
+% [aply,aplx] = histcounts(3*[nsta(apical&~blob).sl],vec);
+histogram(3*[nsta(apical&~blob).lt],vec,'normalization','pdf');
+% aplx = (aplx(1:end-1)+aplx(2:end))/2;
 %%
 close
 figure
