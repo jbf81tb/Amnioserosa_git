@@ -11,7 +11,7 @@ for fr = 1:ml
 fprintf('\b\b\b\b%3u%%',ceil(100*fr/ml));
 end
 fprintf('\b\b\b\b%3u%%\n',100);
-%%
+
 int = zeros(1,length(nsta));
 for i = 1:length(nsta)
 %     int(i) = sum(nsta(i).int./int_sum(nsta(i).frame)')/nsta(i).lt;
@@ -19,7 +19,7 @@ for i = 1:length(nsta)
 end
 %%
 % int = cellfun(@sum,{nsta.int})./[nsta.lt];
-[~, tmpi] = sort(int,'descend');
+[~, tmpi] = sort(int.*double([nsta.class]~=4),'descend');
 blob = false(1,length(nsta));
 blob(tmpi(1:ceil(end/100))) = true;
 % [hy,hx] = hist(int,1000);
@@ -30,23 +30,25 @@ blob(tmpi(1:ceil(end/100))) = true;
 % end
 % int_lim = hx(find(shy-.99>eps,1));
 %%
-mpname = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\max_proj.tif';
+mpname = 'max_proj.tif';
 if exist('tmp.tif','file'), delete('tmp.tif'); end
 fprintf('Percent Complete: %3u%%',0);
 for fr = 1:mov_sz(3)
 %     img = zeros([mov_sz(1:2),3],'uint16');
-    tmp = double(imread(mpname,'index',fr))/(2^16-1);
-    img = cat(3,tmp,tmp,tmp);
+    tmp = uint8(double(imread(mpname,'index',fr))/(2^8-1));
+    img = uint8(cat(3,tmp,tmp,tmp));
     for i = 1:length(nsta)
         if ~blob(i), continue; end
         fr_ind = find(nsta(i).frame == fr);
         xpos = ceil(nsta(i).xpos(fr_ind));
         ypos = ceil(nsta(i).ypos(fr_ind));
-        for xi = 0%-1:1
-            for yi = 0%-1:1
-                img(ypos+yi,xpos+xi,1) = 1;
-                img(ypos+yi,xpos+xi,2) = 0;
-                img(ypos+yi,xpos+xi,3) = 0;
+        for xi = -1:1
+            for yi = -1:1
+                if abs(xi) == abs(yi)
+                    img(ypos+yi,xpos+xi,1) = 255;
+                    img(ypos+yi,xpos+xi,2) = 0;
+                    img(ypos+yi,xpos+xi,3) = 0;
+                end
             end
         end
     end

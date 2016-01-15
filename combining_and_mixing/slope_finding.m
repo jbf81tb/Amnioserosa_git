@@ -1,16 +1,16 @@
 function fxyc_struct = slope_finding(fxyc_struct,frame_rate,bkgrd)
 ints = {fxyc_struct.int};
-mess_up = false;
-if mess_up, frame_rate = 2*frame_rate; end
-prange = 12/frame_rate;
-forwardp = .5;
-front = floor(forwardp*(prange-1));
-rear = ceil((1-forwardp)*(prange-1));
+% mess_up = false;
+% if mess_up, frame_rate = 2*frame_rate; end
+prange = 15.3/frame_rate;
+forwardp = .25;
+front = ceil(forwardp*(prange-1));
+rear = floor((1-forwardp)*(prange-1));
 % fprintf('Percent Complete: %3i%%',0);
 % if frame_rate == 2, frame_rate = 4; mess_up = true; end
 for i = 1:length(ints)
     int = ints{i};
-    if mess_up, int = int(1:2:end); end
+%     if mess_up, int = int(1:2:end); end
     lint = length(int);
     intdif = zeros(lint,1);
     if lint<=prange

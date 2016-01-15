@@ -1,10 +1,17 @@
 F = @(A1,x01,s1,A2,x02,s2,x)(A1*exp(-(x-x01).^2/(2*s1^2))+A2*exp(-(x-x02).^2/(2*s2^2)));
-fit_returns = zeros(4,4,ml,4);
+m1n = 3; m1x = 8;
+sd1n = .5; sd1x = 2;
+m2n = 6; m2x = 25;
+sd2n = .5; sd2x = 5;
+ngc = 8; %number grid cells
+
+ml = max(cell2mat({nsta.frame}'));
+fit_returns = zeros(ngc,ngc,ml,4);
 clear img
 zpa = [];
 close
-fh = figure;
-ah = tight_subplot(8,8,.005,[0 .02],.005);
+fh = figure('color','w');
+ah = tight_subplot(ngc,ngc,.005,[0 .02],.005);
 for fr = 3:ml-2
     xp = []; yp = []; zp = [];
     for i = 1:length(nsta)
@@ -17,17 +24,20 @@ for fr = 3:ml-2
 %     rp = sqrt(xp.^2 + yp.^2);
 %     tp = atan(yp./xp);
 %     zpa = [zpa, zp(cond)];
-    for i = 1:8
-        for j = 1:8
-            cond = yp>(i-1)*64+1 & yp<=i*64&...
-                    xp>(j-1)*64+1 & xp<=j*64;
+gcsz = 512/ngc;
+    for i = 1:ngc
+        for j = 1:ngc
+            cond = yp>(i-1)*gcsz+1 & yp<=i*gcsz&...
+                    xp>(j-1)*gcsz+1 & xp<=j*gcsz;
 %             subplot(8,8,(i-1)*8+j)
-            axes(ah((i-1)*8+j))
-            [hy,tmp] = histcounts(zp(cond),0:1:21);
+            axes(ah((i-1)*ngc+j))
+            [hy,tmp] = histcounts(zp(cond),0.5:1:21.5); %%%adjust
             hx = (tmp(1:end-1)+tmp(2:end))/2;
-            f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1],'lower',[min(hy),1,.5,min(hy),1,.5],'upper',[1.5*max(hy),21,3,max(hy),21,4]);
+            f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1],...
+                'lower',[0,m1n,sd1n,0,m2n,sd2n],...
+                'upper',[1.5*max(hy),m1x,sd1x,1.5*max(hy),m2x,sd2x]);
             tmpval = coeffvalues(f);
-            fit_returns(i,j,fr,1) = tmpval(2); 
+            fit_returns(i,j,fr,1) = tmpval(2);
             fit_returns(i,j,fr,2) = tmpval(3);
             fit_returns(i,j,fr,3) = tmpval(5);
             fit_returns(i,j,fr,4) = tmpval(6);
@@ -50,15 +60,24 @@ end
 basal = false(1,length(nsta));
 apical = false(1,length(nsta));
 for i = 1:length(nsta)
-    quadx = ceil(mean(nsta(i).xpos)/64);
-    quady = ceil(mean(nsta(i).ypos)/64);
+    quadx = ceil(mean(nsta(i).xpos)/gcsz);
+    quady = ceil(mean(nsta(i).ypos)/gcsz);
     mnz = mean(nsta(i).st);
     fr = ceil(mean(nsta(i).frame));
+    
     if abs(mnz-fit_returns(quady,quadx,fr,1))<fit_returns(quady,quadx,fr,2)
-        apical(i) = true;
-    elseif abs(mnz-fit_returns(quady,quadx,fr,3))<2*fit_returns(quady,quadx,fr,2)
-%         if fit_returns(quady,quadx,fr,4)
-        basal(i) = true;
+        if fit_returns(quady,quadx,fr,2) ~= sd1n && fit_returns(quady,quadx,fr,2) ~= sd1x
+            if fit_returns(quady,quadx,fr,1) ~= m1n && fit_returns(quady,quadx,fr,2) ~= m1x
+                apical(i) = true;
+            end
+        end
+    elseif abs(mnz-fit_returns(quady,quadx,fr,3))<fit_returns(quady,quadx,fr,4)
+        if fit_returns(quady,quadx,fr,4) ~= sd2n && fit_returns(quady,quadx,fr,4) ~= sd2x
+            if fit_returns(quady,quadx,fr,3) ~= m2n && fit_returns(quady,quadx,fr,3) < 21
+                %               if fit_returns(quady,quadx,fr,4)
+                basal(i) = true;
+            end
+        end
     end
 end
 %%

@@ -8,7 +8,7 @@ for i = 1:size(Centers,3);
 end
 %%
 ml = max(cellfun(@max,{nsta.frame}));
-gs = 1;%grid size
+gs = 8;%grid size
 numC = size(Centers,3);
 window = 2;
 % vec = -0.15:.01:.15;
@@ -34,7 +34,7 @@ for cen = 1:gs^2
             end
         end
     end
-    cond = good{cen}'&basal&~blob;
+    cond = good{cen}'&apical&~blob;
 %     cond = blob;
     frames = {nsta(cond).frame};
     slopes = {nsta(cond).sl};
@@ -62,7 +62,7 @@ color = 'rkgbm';
 % ah = tight_subplot(gs,gs,.005,[0 .02],.005);
 for fr = 1:ml
     close
-figure('position',[0 0 1 1])
+figure('position',[0 0 4 4])
 ah = tight_subplot(gs,gs,.005,[0 .02],.005);
 %     hold off
 % sub = 0;

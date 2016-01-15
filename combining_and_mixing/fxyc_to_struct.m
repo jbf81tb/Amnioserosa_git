@@ -7,7 +7,7 @@ i = 0;
 for j = 1:size(fxyc,3)
     during = squeeze(fxyc(:,1,j)>0);
     if isempty(during), continue; end
-%     if fxyc(1,4,j)==4,continue; end %comment out if desired
+    if fxyc(1,4,j)==4,continue; end %comment out if desired
     i = i+1;
     fxyc_struct(i).frame = fxyc(during,1,j);
     fxyc_struct(i).xpos = fxyc(during,2,j);
