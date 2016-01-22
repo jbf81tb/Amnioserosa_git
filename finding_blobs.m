@@ -30,7 +30,7 @@ blob(tmpi(1:ceil(end/100))) = true;
 % end
 % int_lim = hx(find(shy-.99>eps,1));
 %%
-mpname = 'max_proj.tif';
+mpname = 'E:\MATLAB\Josh\ran_movies\Hela_movie\orig_movies\20151005_hela plaques cell 7_z2.tif';
 if exist('tmp.tif','file'), delete('tmp.tif'); end
 fprintf('Percent Complete: %3u%%',0);
 for fr = 1:mov_sz(3)
@@ -54,7 +54,7 @@ for fr = 1:mov_sz(3)
     end
 %     image(img)
 %     pause
-imwrite(img,'tmp.tif','writemode','append')
+imwrite(img,['tmp\' num2str(fr) '.tif'])
 fprintf('\b\b\b\b%3u%%',ceil(100*fr/mov_sz(3)));
 end
 fprintf('\b\b\b\b%3u%%\n',100);

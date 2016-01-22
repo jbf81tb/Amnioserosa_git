@@ -3,7 +3,7 @@ for i = 1:6
     nstca = [nstca, nst{i}];
 end
 %%
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
+mov_nm = 'E:\MATLAB\Josh\ran_movies\Hela_movie\20151005_hela plaques cell 7_z1.tif';
 mov_sz = [size(imread(mov_nm)), length(imfinfo(mov_nm))];
 %%
 cond = [];%true(1,length(nsta));
