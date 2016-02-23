@@ -1,13 +1,29 @@
-function fxyc_struct = fxyc_to_struct(fxyc)
+function fxyc_struct = fxyc_to_struct(fxyc,varargin)
 %FXYC_TO_STRUCT Converts Threshfxyc to a structure.
 %   also does gap filling and removes empty traces
+if nargin==1
+    no4s=true;
+elseif nargin==2
+    if ischar(varargin{1})
+        if strcmpi(varargin{1},'no4s')
+            no4s = true;
+        elseif strcmpi(varargin{1},'w4s')
+            no4s = false;
+        end
+    elseif islogical(varargin{1})
+        no4s = varargin{1};
+    else
+        no4s=true;
+        fprintf('Invalid input. Proceeding with removal of 4''s');
+    end
+end
 fxyc_struct = struct('frame',[],'xpos',[],'ypos',[],'class',[],'int',[]);
 if isempty(fxyc), return; end
 i = 0;
 for j = 1:size(fxyc,3)
     during = squeeze(fxyc(:,1,j)>0);
     if isempty(during), continue; end
-    if fxyc(1,4,j)==4,continue; end %comment out if desired
+    if no4s && fxyc(1,4,j)==4,continue; end
     i = i+1;
     fxyc_struct(i).frame = fxyc(during,1,j);
     fxyc_struct(i).xpos = fxyc(during,2,j);

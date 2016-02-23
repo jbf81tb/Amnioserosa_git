@@ -8,7 +8,7 @@ analyze.
 simg = size(imread(filename));
 frames = length(imfinfo(filename));
 IMG = zeros([simg,frames],'double');
-scale = (2^16-1);
+scale = intmax('uint16');
 for j=1:frames
     IMG(:,:,j) = imread(filename,'Index',j);
 end

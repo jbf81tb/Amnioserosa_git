@@ -68,7 +68,7 @@ for sec = 1:sst(1)
             mask{sec,st,fr} = conv2(mask{sec,st,fr},.25*[1,1,1;1,4,1;1,1,1],'same');
             if st>1
                 img=ind_mask{sec,st-1,fr}.*ind_mask{sec,st,fr}.*(mask{sec,st-1,fr}+mask{sec,st,fr}>1);
-                B = bwboundaries(img);
+                B = bwboundaries(img,8,'noholes');
                 pinds{sec,st-1} = zeros(length(B),2);
                 for i = 1:length(B)
                     if size(B{i},1)==2

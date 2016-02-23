@@ -30,7 +30,7 @@ for mov = 1:nm
     for st = 1:length(omdm)
         if ~exist(fullfile(omd,omdm(ndt(st)).name),'file'), continue; end
         load(fullfile(omd,omdm(ndt(st)).name),'Threshfxyc');
-        sta{mov,st} = fxyc_to_struct(Threshfxyc);
+        sta{mov,st} = fxyc_to_struct(Threshfxyc,true);
 %         fprintf('%s\n',omdm(ndt(st)).name)
 %         names{mov,st} = sprintf('%s, %s',mdir(ndx(mov)).name(end-8:end-4),omdm(ndt(st)).name);
     end

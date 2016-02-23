@@ -14,22 +14,24 @@ fprintf('\b\b\b\b%3u%%',ceil(100*fr/ml));
 end
 fprintf('\b\b\b\b%3u%%\n',100);
 end
-%%
+
 int = cell(1,length(cnsta));
 for sec = 1:length(cnsta)
 int{sec} = zeros(1,length(cnsta{sec}));
 for i = 1:length(cnsta{sec})
 %     int(i) = sum(cnsta{sec}(i).int./int_sum{sec}(cnsta{sec}(i).frame)')/cnsta{sec}(i).lt;
-    int{sec}(i) = max(cnsta{sec}(i).int./int_sum{sec}(cnsta{sec}(i).frame)');
+%     int{sec}(i) = sum(cnsta{sec}(i).int)/cnsta{sec}(i).lt;
+%     int{sec}(i) = max(cnsta{sec}(i).int);%./int_sum{sec}(cnsta{sec}(i).frame)');
+    int{sec}(i) = sum(cnsta{sec}(i).int./int_sum{sec}(cnsta{sec}(i).frame)')/cnsta{sec}(i).lt;
 end
 end
-%%
+
 blob = cell(1,length(cnsta));
 for sec = 1:length(cnsta)
 % int = cellfun(@sum,{cnsta{sec}.int})./[cnsta{sec}.lt];
 [~, tmpi] = sort(int{sec},'descend');
 blob{sec} = false(1,length(cnsta{sec}));
-blob{sec}(tmpi(1:ceil(end/100))) = true;
+blob{sec}(tmpi(1:ceil(2*length(tmpi)/100))) = true;
 % [hy,hx] = hist(int,1000);
 % shy = zeros(1,length(hy));
 % shy(1) = hy(1)/sum(hy);
@@ -39,8 +41,11 @@ blob{sec}(tmpi(1:ceil(end/100))) = true;
 % int_lim = hx(find(shy-.99>eps,1));
 end
 %%
-mpname = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\max_proj.tif';
-if exist('tmp.tif','file'), delete('tmp.tif'); end
+mpname = 'E:\Josh\Matlab\cmeAnalysis_movies\160125_amnioseroa_mm\movies\emb1_z0.4um_t3s_t=40min\max_proj.tif';
+sec = 5;
+mov_sz = [size(imread(mpname)) length(imfinfo(mpname))];
+if exist('tmp','dir'), rmdir('tmp','s'); end
+mkdir('tmp');
 fprintf('Percent Complete: %3u%%',0);
 for fr = 1:mov_sz(3)
 %     img = zeros([mov_sz(1:2),3],'uint16');
@@ -51,17 +56,19 @@ for fr = 1:mov_sz(3)
         fr_ind = find(cnsta{sec}(i).frame == fr);
         xpos = ceil(cnsta{sec}(i).xpos(fr_ind));
         ypos = ceil(cnsta{sec}(i).ypos(fr_ind));
-        for xi = 0%-1:1
-            for yi = 0%-1:1
+        for xi = -1:1
+            for yi = -1:1
+                if abs(xi) == abs(yi)
                 img(ypos+yi,xpos+xi,1) = 1;
                 img(ypos+yi,xpos+xi,2) = 0;
                 img(ypos+yi,xpos+xi,3) = 0;
+                end
             end
         end
     end
 %     image(img)
 %     pause
-imwrite(img,'tmp.tif','writemode','append')
+imwrite(img,fullfile('tmp',[sprintf('%03i',fr) '.tif']),'tif')
 fprintf('\b\b\b\b%3u%%',ceil(100*fr/mov_sz(3)));
 end
 fprintf('\b\b\b\b%3u%%\n',100);

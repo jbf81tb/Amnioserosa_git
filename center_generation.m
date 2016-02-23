@@ -36,7 +36,27 @@ plot(squeeze(fit_returns_a(:,3))-squeeze(fit_returns_a(:,4)),'r--')
 title('blue = apical | red = basal')
 ylim([1,21])
 %%
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\orig_movies\Section_1_Stack_1.tif';
+am = zeros(sum(apical),ml);  ai = 1;
+bm = zeros(sum(basal),ml);  bi = 1;
+for i = 1:length(nsta)
+    if apical(i)
+        am(ai,nsta(i).frame) = nsta(i).st;
+        ai = ai+1;
+    end
+    if basal(i)
+        bm(bi,nsta(i).frame) = nsta(i).st;
+        bi = bi+1;
+    end
+end
+ampf = zeros(1,ml);
+bmpf = zeros(1,ml);
+for fr = 1:ml
+    ampf(fr) = mean(nonzeros(am(:,fr)));
+    bmpf(fr) = mean(nonzeros(bm(:,fr)));
+end
+mid = round((ampf+bmpf)/2);
+%%
+mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
 mov_sz = [size(imread(mov_nm)), length(imfinfo(mov_nm))];
 sum_img = zeros(mov_sz);
 for fr = 1:mov_sz(3)
@@ -61,12 +81,23 @@ for fr = 1:mov_sz(3)
 end
 %%
 filename = 'centers_proj.tif';
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\emb2_z0.4um_t1s001_good\orig_movies\Section_1_Stack_1.tif';
+mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
 if exist(filename,'file'), delete(filename); end
 for fr = 1:length(imfinfo(mov_nm))
     frame_img = imread([mov_nm(1:end-5) num2str(mid(fr)+1) '.tif'],fr);
 %     dots = uint16(conv2(cent_map{fr},ones(3),'same'));
     dots = uint16(cent_map{fr});
+    tmp = frame_img - frame_img.*dots + intmax('uint16')*dots;
+    imwrite(uint16(tmp),filename,'writemode','append')
+end
+%%
+filename = 'centers_proj.tif';
+mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\mb1_z0.4um_t1s002_good\orig_movies\Section_1_Stack_1.tif';
+if exist(filename,'file'), delete(filename); end
+for fr = 1:length(imfinfo(mov_nm))
+    frame_img = imread([mov_nm(1:end-5) num2str(mid(fr)+1) '.tif'],fr);
+    dots = zeros(512,512,'uint16');
+    dots((round(Centers(fr,1,:)-1)*512+round(Centers(fr,2,:)))) = 1;
     tmp = frame_img - frame_img.*dots + intmax('uint16')*dots;
     imwrite(uint16(tmp),filename,'writemode','append')
 end

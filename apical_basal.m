@@ -1,56 +1,113 @@
-F = @(A1,x01,s1,A2,x02,s2,x)(A1*exp(-(x-x01).^2/(2*s1^2))+A2*exp(-(x-x02).^2/(2*s2^2)));
-m1n = 3; m1x = 8;
-sd1n = .5; sd1x = 2;
-m2n = 6; m2x = 25;
-sd2n = .5; sd2x = 5;
+F = @(A1,x01,s1,A3,A2,x02,s2,x)...
+double(A1<A3|A2<A3)*double((x02-s2)>(x01+s1))*...
+    (A1*exp(-(x-x01).^2/(2*s1^2)).*double(x<=(x01+s1))+...
+    A3*double(x>(x01+s1)).*double(x<(x02-s2))+...
+    A2*exp(-(x-x02).^2/(2*s2^2)).*double(x>=(x02-s2)))+...
+double(A1>A3)*double(A2>A3)*double((x02-s2)>(x01+s1))*...
+    (A1*exp(-(x-x01).^2/(2*s1^2)).*double(x<=(x01+s1*sqrt(2*log(A1/A3))))+...
+    A3*double(x>(x01+s1*sqrt(2*log(A1/A3)))).*double(x<(x02-s2*sqrt(2*log(A2/A3))))+...
+    A2*exp(-(x-x02).^2/(2*s2^2)).*double(x>=(x02-s2*sqrt(2*log(A2/A3)))))+...
+double((x02-s2)<(x01+s1))*...
+    (A1*exp(-(x-x01).^2/(2*s1^2))+...
+    A2*exp(-(x-x02).^2/(2*s2^2)));
+Fgaus = @(A,x0,s,x)(A*exp(-(x-x0).^2/(2*s^2)));
+ml = max(cellfun(@max,{nsta.frame}));
+maxst = max(cellfun(@max,{nsta.st}));
+m1n = 1; m1x = 8;
+sd1n = .5; sd1x = 3;
+m2n = 8; m2x = maxst;
+sd2n = .5; sd2x = 3;
 ngc = 8; %number grid cells
-
-ml = max(cell2mat({nsta.frame}'));
-fit_returns = zeros(ngc,ngc,ml,4);
-clear img
-zpa = [];
-close
-fh = figure('color','w');
-ah = tight_subplot(ngc,ngc,.005,[0 .02],.005);
-for fr = 3:ml-2
+frwin = 5;
+vec = 0.5:(maxst+.5);
+fit_returns = zeros(ngc,ngc,ml-2*frwin,11);
+show = true;
+% show = false;
+if show
+    fh = figure('units','normalized','position',[0 0 1 1],'color','w');
+    ah = tight_subplot(ngc,ngc,.005,[0 .02],.005);
+end
+fname = 'tmp.tif';
+if exist(fname,'file'), delete(fname); end
+fprintf('Percent Complete: %3u%%',0);
+for fr = (frwin+1):floor(frwin/2):ml-frwin
     xp = []; yp = []; zp = [];
     for i = 1:length(nsta)
         if ~any(nsta(i).frame==fr), continue; end
-        fr_ind = abs(nsta(i).frame-fr)<=2;
+        fr_ind = abs(nsta(i).frame-fr)<=frwin;
+        %         if masks(round(mean(nsta(i).xpos(fr_ind))),...
+        %                 round(mean(nsta(i).ypos(fr_ind))))
+        %             continue;
+        %         end
         xp = [xp; nsta(i).xpos(fr_ind)];
         yp = [yp; nsta(i).ypos(fr_ind)];
         zp = [zp; nsta(i).st(fr_ind)];
     end
-%     rp = sqrt(xp.^2 + yp.^2);
-%     tp = atan(yp./xp);
-%     zpa = [zpa, zp(cond)];
-gcsz = 512/ngc;
+    gcsz = 512/ngc;
     for i = 1:ngc
         for j = 1:ngc
             cond = yp>(i-1)*gcsz+1 & yp<=i*gcsz&...
-                    xp>(j-1)*gcsz+1 & xp<=j*gcsz;
-%             subplot(8,8,(i-1)*8+j)
-            axes(ah((i-1)*ngc+j))
-            [hy,tmp] = histcounts(zp(cond),0.5:1:21.5); %%%adjust
+                xp>(j-1)*gcsz+1 & xp<=j*gcsz;
+            if show, axes(ah((i-1)*ngc+j)); end
+            [hy,tmp] = histcounts(zp(cond),vec);
             hx = (tmp(1:end-1)+tmp(2:end))/2;
-            f = fit(hx',hy',F,'startpoint',[max(hy), 4, 1, max(hy)/2, 10, 1],...
-                'lower',[0,m1n,sd1n,0,m2n,sd2n],...
-                'upper',[1.5*max(hy),m1x,sd1x,1.5*max(hy),m2x,sd2x]);
+            [f, gof] = fit(hx',hy',F,...
+                'startpoint',[max(hy), 5, 1, mean(hy), max(hy)/2, 11, 1],...
+                'lower',[0,m1n,sd1n,0,0,m2n,sd2n],...
+                'upper',[1.5*max(hy),m1x,sd1x,max(hy),1.5*max(hy),m2x,sd2x]);
             tmpval = coeffvalues(f);
-            fit_returns(i,j,fr,1) = tmpval(2);
-            fit_returns(i,j,fr,2) = tmpval(3);
-            fit_returns(i,j,fr,3) = tmpval(5);
-            fit_returns(i,j,fr,4) = tmpval(6);
-            plot(f,hx,hy)
-            legend off
-            axis off
+            rtvec = [tmpval gof.adjrsquare];
+            fit_returns(i,j,fr-frwin,1:length(rtvec)) = rtvec;
+            
+            c1 = tmpval(2); s1 = tmpval(3);
+            start1 = max(1,floor(c1-s1)); stop1 = min(length(hx),ceil(c1+s1));
+            y_r1 = Fgaus(tmpval(1),tmpval(2),tmpval(3),start1:stop1);
+            rsq1 = 1-SSE(y_r1,hy(start1:stop1))/SST(hy(start1:stop1));
+            fit_returns(i,j,fr-frwin,9) = rsq1;
+            
+            c2 = tmpval(6); s2 = tmpval(7);
+            start2 = max(1,floor(c2-s2)); stop2 = min(length(hx),ceil(c2+s2));
+            y_r2 = Fgaus(tmpval(5),tmpval(6),tmpval(7),start2:stop2);
+            rsq2 = 1-SSE(y_r2,hy(start2:stop2))/SST(hy(start2:stop2));
+            fit_returns(i,j,fr-frwin,10) = rsq2;
+            
+            if show
+                hold off
+                plot(hx,hy,'.');
+                tmpc = num2cell(tmpval);
+                tmpx = min(hx):.01:max(hx);
+                hold on
+                plot(tmpx,F(tmpc{:},tmpx));
+                axis off
+                legend off
+                if fit_returns(i,j,fr-frwin,9)>.5
+                    text(.1,.7,'GOOD','Units','normalized','color','r')
+                end
+                if fit_returns(i,j,fr-frwin,10)>.5
+                    text(.5,.7,'GOOD','Units','normalized','color','b')
+                end
+                if fit_returns(i,j,fr-frwin,10)>.4 && hy(min(ceil(c2),length(hy)))/max(y_r2)>1.1
+                    text(.5,.7,'GOOD','Units','normalized','color','b')
+                    fit_returns(i,j,fr-frwin,11)=1;
+                end
+            end
         end
     end
-    set(fh,'name',num2str(fr));
-    drawnow;
-%     img(:,:,fr) = Hist2D(yp(cond),zp(cond),200:2:300,0.5:.25:21.5);
+    if show
+        set(fh,'name',num2str(fr));
+        drawnow;
+    end
+    frame = getframe(gcf);
+    imwrite(frame.cdata,fname,'tif','writemode','append')
+    fprintf('\b\b\b\b%3u%%',ceil(100*fr/(ml-frwin)));
 end
+fprintf('\b\b\b\b%3u%%\n',100);
 close
+for fr = (frwin+2):(ml-frwin-1)
+    if all(reshape(fit_returns(:,:,fr,:),[],1)==0)
+        fit_returns(:,:,fr,:) = fit_returns(:,:,fr-1,:);
+    end
+end
 %%
 if exist('tmp','file'), delete('tmp.tif'); end
 for fr = 1:ml
@@ -63,19 +120,21 @@ for i = 1:length(nsta)
     quadx = ceil(mean(nsta(i).xpos)/gcsz);
     quady = ceil(mean(nsta(i).ypos)/gcsz);
     mnz = mean(nsta(i).st);
-    fr = ceil(mean(nsta(i).frame));
-    
-    if abs(mnz-fit_returns(quady,quadx,fr,1))<fit_returns(quady,quadx,fr,2)
-        if fit_returns(quady,quadx,fr,2) ~= sd1n && fit_returns(quady,quadx,fr,2) ~= sd1x
-            if fit_returns(quady,quadx,fr,1) ~= m1n && fit_returns(quady,quadx,fr,2) ~= m1x
+    fr = ceil(mean(nsta(i).frame))-frwin;
+    if fr<1||fr>(ml-2*frwin), continue; end
+    if ~any(nsta(i).frame>frwin & nsta(i).frame<=(ml-frwin)), continue; end
+    tmpc = num2cell(reshape(fit_returns(quady,quadx,fr,:),[],1));
+    [A1,x01,s1,A3,A2,x02,s2,adjrsq,rsqa,rsqb,othb] = tmpc{:};
+    if A1>A3
+        if abs(mnz-x01)<(s1*sqrt(2*log(A1/A3)))
+            if rsqa>.5
                 apical(i) = true;
             end
-        end
-    elseif abs(mnz-fit_returns(quady,quadx,fr,3))<fit_returns(quady,quadx,fr,4)
-        if fit_returns(quady,quadx,fr,4) ~= sd2n && fit_returns(quady,quadx,fr,4) ~= sd2x
-            if fit_returns(quady,quadx,fr,3) ~= m2n && fit_returns(quady,quadx,fr,3) < 21
-                %               if fit_returns(quady,quadx,fr,4)
-                basal(i) = true;
+        elseif A2>A3 && abs(mnz-x02)<(s2*sqrt(2*log(A2/A3)))
+            if rsqb>.4
+                if rsqb>.5 || othb==1
+                    basal(i) = true;
+                end
             end
         end
     end

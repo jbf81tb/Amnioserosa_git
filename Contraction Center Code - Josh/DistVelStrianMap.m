@@ -11,9 +11,8 @@ frames=max(cellfun(@max,{fxyc_struct.frame}));
 DVSMap=cell(frames,2);
 isframe = cell(frames,1);
 for i = 1:frames
-    isframe{i} = [];
     for j = 1:lst
-        if sum(fxyc_struct(j).frame==i)
+        if any(fxyc_struct(j).frame==i)
             isframe{i} = [isframe{i} j];
         end
     end

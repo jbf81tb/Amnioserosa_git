@@ -1,3 +1,4 @@
+ml = max(cellfun(@max,{nsta.frame}));
 int_sum = zeros(1,ml);
 fprintf('Percent Complete: %3u%%',0);
 for fr = 1:ml
@@ -11,17 +12,17 @@ for fr = 1:ml
 fprintf('\b\b\b\b%3u%%',ceil(100*fr/ml));
 end
 fprintf('\b\b\b\b%3u%%\n',100);
-
+%%
 int = zeros(1,length(nsta));
 for i = 1:length(nsta)
-%     int(i) = sum(nsta(i).int./int_sum(nsta(i).frame)')/nsta(i).lt;
-    int(i) = max(nsta(i).int./int_sum(nsta(i).frame)');
+    int(i) = sum(nsta(i).int./int_sum(nsta(i).frame)')/nsta(i).lt;
+%     int(i) = max(nsta(i).int./int_sum(nsta(i).frame)');
 end
-%%
+
 % int = cellfun(@sum,{nsta.int})./[nsta.lt];
 [~, tmpi] = sort(int.*double([nsta.class]~=4),'descend');
 blob = false(1,length(nsta));
-blob(tmpi(1:ceil(end/100))) = true;
+blob(tmpi(1:ceil(2*length(tmpi)/100))) = true;
 % [hy,hx] = hist(int,1000);
 % shy = zeros(1,length(hy));
 % shy(1) = hy(1)/sum(hy);

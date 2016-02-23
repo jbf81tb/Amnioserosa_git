@@ -9,7 +9,9 @@ for i = 1:size(Centers,1)
         figure('units','pixels','position',[100 100 700 700])
         axes('units','pixels','position',[10 10 512 512])
 %         img = imread('emb1_z0.4um_t1s002_good.tif',(i-1)*22+st);
-        imagesc(cent_img(:,:,i).*uint16(cent_img(:,:,i)<intmax('uint16')));
+        cent_img = imread('centers_proj.tif',i);
+        imagesc(cent_img.*uint16(cent_img<intmax('uint16')));
+        colormap('gray')
 %         imagesc(uint16(nathan_apical{i}/maxsl*(2^16-1)))
         hold on
 %         scatter(squeeze(Centers(:,i,1)),squeeze(Centers(:,i,2)),'.r')
@@ -22,7 +24,7 @@ for i = 1:size(Centers,1)
         end
         plot(tb(:,1),tb(:,2),'r');
         text_cell = arrayfun(@num2str,1:size(Centers,3),'uniformoutput',false);
-        text(squeeze(Centers(i,1,:)),squeeze(Centers(i,2,:)),text_cell);
+        text(squeeze(Centers(i,1,:)),squeeze(Centers(i,2,:)),text_cell,'color','w','FontSize',14);
         % v = V{i}; c = C{i};
         % q = pdist([v(:,1),v(:,2);squeeze(Centers(:,i,1)),squeeze(Centers(:,i,2))]);
         % w = squareform(q);
