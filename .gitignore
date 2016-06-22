@@ -1,4 +1,8 @@
 *.asv
 *.tif
+<<<<<<< HEAD
 *.zip
 *.mat
+=======
+*.tif
+>>>>>>> origin/master
