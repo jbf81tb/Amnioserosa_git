@@ -1,8 +1,14 @@
+V = cell(1,size(Centers,1));
+C = cell(1,size(Centers,1));
+for i = 1:size(Centers,1)
+    [V{i},C{i}] = voronoin([squeeze(Centers(i,1,:)),squeeze(Centers(i,2,:))]);
+end
+%%
 if exist('tmp.tif','file'), delete('tmp.tif'), end
 % sames = false(1,size(Centers,2));
 
-V = cell(1,size(Centers,1));
-C = cell(1,size(Centers,1));
+% V = cell(1,size(Centers,1));
+% C = cell(1,size(Centers,1));
 for i = 1:size(Centers,1)
 %     for st = 1:22
         close
@@ -15,7 +21,7 @@ for i = 1:size(Centers,1)
 %         imagesc(uint16(nathan_apical{i}/maxsl*(2^16-1)))
         hold on
 %         scatter(squeeze(Centers(:,i,1)),squeeze(Centers(:,i,2)),'.r')
-        [V{i},C{i}] = voronoin([squeeze(Centers(i,1,:)),squeeze(Centers(i,2,:))]);
+%         [V{i},C{i}] = voronoin([squeeze(Centers(i,1,:)),squeeze(Centers(i,2,:))]);
         %     V{i}(1,:) = [512,512];
         for j = 1:length(C{i})
             %   C{i}{j}(C{i}{j}==1) = [];
