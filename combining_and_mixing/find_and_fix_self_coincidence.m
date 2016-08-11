@@ -22,7 +22,7 @@ else
             end
         end
     end
-    fprintf('Percent complete: %3i%%',0);
+%     fprintf('Percent complete: %3i%%',0);
     for fr = 1:ml
         allx = []; ally = []; pind = [];
         for i = 1:length(xpos)
@@ -58,9 +58,9 @@ else
                 pinds{tmp(j),fr} = tmp(tmp~=tmp(j));
             end
         end
-        fprintf('\b\b\b\b%3i%%',ceil(100*fr/ml));
+%         fprintf('\b\b\b\b%3i%%',ceil(100*fr/ml));
     end
-    fprintf('\b\b\b\b%3i%%\n',100);
+%     fprintf('\b\b\b\b%3i%%\n',100);
 end
 for i = 1:size(pinds,1)
     if isempty(fxyc_struct(i).frame), continue; end

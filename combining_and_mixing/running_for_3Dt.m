@@ -27,13 +27,27 @@ for mov = 1:nm
         imwrite(img,mp_filename,'tif','writemode','append')
     end
 %     fprintf('%s\n',mdir(ndx(mov)).name)
-    for st = 1:length(omdm)
-        if ~exist(fullfile(omd,omdm(ndt(st)).name),'file'), continue; end
-        load(fullfile(omd,omdm(ndt(st)).name),'Threshfxyc');
-        sta{mov,st} = fxyc_to_struct(Threshfxyc,true);
+    for st = 1:length(omdm)-1
+        if ~exist(fullfile(omd,omdm(ndt(st+1)).name),'file'), continue; end
+        load(fullfile(omd,omdm(ndt(st+1)).name),'Threshfxyc');
+        sta{mov,st} = fxyc_to_struct(Threshfxyc,'w4s');
 %         fprintf('%s\n',omdm(ndt(st)).name)
 %         names{mov,st} = sprintf('%s, %s',mdir(ndx(mov)).name(end-8:end-4),omdm(ndt(st)).name);
     end
 end
-nsta = combining_and_mixing(sta,mp_filename,framegap,thresh);
+nstac = combining_and_mixing(sta,mp_filename,framegap,thresh);
+nsta = cell(1,nm);
+for i = 1:nm
+    for j = 1:size(nstac,2);
+        nsta{i} = [nsta{i}, nstac{i,j}];
+    end
+end
+for i = 1:length(nsta)
+    fnames = fieldnames(nsta{i});
+    for j = 1:length(nsta{i})
+        for k = 1:length(fnames)
+            nsta{i}(j).(fnames{k}) = single(nsta{i}(j).(fnames{k}));
+        end
+    end
+end
 end

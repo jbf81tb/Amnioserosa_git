@@ -18,15 +18,19 @@ sd1n = .5; sd1x = 3;
 m2n = 8; m2x = maxst;
 sd2n = .5; sd2x = 3;
 ngc = 8; %number grid cells
-frwin = 5;
+frwin = 4;
 vec = 0.5:(maxst+.5);
 fit_returns = zeros(ngc,ngc,ml-2*frwin,11);
+figure
+cmap = colormap('jet');
+close
 show = true;
 % show = false;
 if show
     fh = figure('units','normalized','position',[0 0 1 1],'color','w');
     ah = tight_subplot(ngc,ngc,.005,[0 .02],.005);
 end
+mask = imread('E:\Josh\Matlab\cmeAnalysis_movies\new_amneo_movies\movies\160714_emb1_middle\Mask.tif');
 fname = 'tmp.tif';
 if exist(fname,'file'), delete(fname); end
 fprintf('Percent Complete: %3u%%',0);
@@ -35,10 +39,10 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
     for i = 1:length(nsta)
         if ~any(nsta(i).frame==fr), continue; end
         fr_ind = abs(nsta(i).frame-fr)<=frwin;
-        %         if masks(round(mean(nsta(i).xpos(fr_ind))),...
-        %                 round(mean(nsta(i).ypos(fr_ind))))
-        %             continue;
-        %         end
+        if mask(round(mean(nsta(i).ypos(fr_ind))),...
+                 round(mean(nsta(i).xpos(fr_ind))))
+            continue;
+        end
         xp = [xp; nsta(i).xpos(fr_ind)];
         yp = [yp; nsta(i).ypos(fr_ind)];
         zp = [zp; nsta(i).st(fr_ind)];
@@ -60,16 +64,16 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
             fit_returns(i,j,fr-frwin,1:length(rtvec)) = rtvec;
             
             c1 = tmpval(2); s1 = tmpval(3);
-            start1 = max(1,floor(c1-s1)); stop1 = min(length(hx),ceil(c1+s1));
+            start1 = max(1,round(c1-s1)); stop1 = min(length(hx),round(c1+s1));
             y_r1 = Fgaus(tmpval(1),tmpval(2),tmpval(3),start1:stop1);
             rsq1 = 1-SSE(y_r1,hy(start1:stop1))/SST(hy(start1:stop1));
-            fit_returns(i,j,fr-frwin,9) = rsq1;
+            fit_returns(i,j,fr-frwin,9) = max(rsq1,0);
             
             c2 = tmpval(6); s2 = tmpval(7);
-            start2 = max(1,floor(c2-s2)); stop2 = min(length(hx),ceil(c2+s2));
+            start2 = max(1,round(c2-s2)); stop2 = min(length(hx),round(c2+s2));
             y_r2 = Fgaus(tmpval(5),tmpval(6),tmpval(7),start2:stop2);
             rsq2 = 1-SSE(y_r2,hy(start2:stop2))/SST(hy(start2:stop2));
-            fit_returns(i,j,fr-frwin,10) = rsq2;
+            fit_returns(i,j,fr-frwin,10) = max(rsq2,0);
             
             if show
                 hold off
@@ -80,14 +84,11 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
                 plot(tmpx,F(tmpc{:},tmpx));
                 axis off
                 legend off
-                if fit_returns(i,j,fr-frwin,9)>.5
-                    text(.1,.7,'GOOD','Units','normalized','color','r')
-                end
-                if fit_returns(i,j,fr-frwin,10)>.5
-                    text(.5,.7,'GOOD','Units','normalized','color','b')
-                end
+                text(.1,.7,sprintf('%2.2f',fit_returns(i,j,fr-frwin,9)),...
+                    'Units','normalized','color','r')
+                text(.5,.7,sprintf('%2.2f',fit_returns(i,j,fr-frwin,10)),...
+                    'Units','normalized','color','b')
                 if fit_returns(i,j,fr-frwin,10)>.4 && hy(min(ceil(c2),length(hy)))/max(y_r2)>1.1
-                    text(.5,.7,'GOOD','Units','normalized','color','b')
                     fit_returns(i,j,fr-frwin,11)=1;
                 end
             end
@@ -103,11 +104,11 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
 end
 fprintf('\b\b\b\b%3u%%\n',100);
 close
-for fr = (frwin+2):(ml-frwin-1)
-    if all(reshape(fit_returns(:,:,fr,:),[],1)==0)
-        fit_returns(:,:,fr,:) = fit_returns(:,:,fr-1,:);
-    end
-end
+% for fr = 2:(ml-2*frwin)
+%     if all(reshape(fit_returns(:,:,fr,:),[],1)==0)
+%         fit_returns(:,:,fr,:) = fit_returns(:,:,fr-1,:);
+%     end
+% end
 %%
 if exist('tmp','file'), delete('tmp.tif'); end
 for fr = 1:ml
@@ -126,14 +127,16 @@ for i = 1:length(nsta)
     tmpc = num2cell(reshape(fit_returns(quady,quadx,fr,:),[],1));
     [A1,x01,s1,A3,A2,x02,s2,adjrsq,rsqa,rsqb,othb] = tmpc{:};
     if A1>A3
-        if abs(mnz-x01)<(s1*sqrt(2*log(A1/A3)))
-            if rsqa>.5
-                apical(i) = true;
-            end
-        elseif A2>A3 && abs(mnz-x02)<(s2*sqrt(2*log(A2/A3)))
-            if rsqb>.4
-                if rsqb>.5 || othb==1
-                    basal(i) = true;
+        if ~mask(round(mean(nsta(i).ypos)),round(mean(nsta(i).xpos)))
+            if abs(mnz-x01)<(s1*sqrt(2*log(A1/A3)))
+                if rsqa>.5
+                    apical(i) = true;
+                end
+            elseif A2>A3 && abs(mnz-x02)<(s2*sqrt(2*log(A2/A3)))
+                if rsqb>.4
+                    if rsqb>.5 || othb==1
+                        basal(i) = true;
+                    end
                 end
             end
         end

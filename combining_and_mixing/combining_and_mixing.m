@@ -6,7 +6,7 @@ if ~isstruct(structs{1,1})
     fprintf('Making structs... ');
     for sec = 1:sst(1)
         for st = 1:sst(2)
-            structs{sec,st} = fxyc_to_struct(structs{sec,st});
+            structs{sec,st} = fxyc_to_struct(structs{sec,st},'w4s');
         end
     end
     fprintf('complete.\n');
@@ -45,7 +45,7 @@ for sec = 1:sst(1)
     for st = 1:nps
         tmpl = cellfun(@isempty,{structs{sec,st}.frame});
         structs{sec,st}(tmpl) = [];
-        structs{sec,st} = slope_finding(structs{sec,st},frame_length,thresh);
+        structs{sec,st} = slope_finding(structs{sec,st},frame_length(sec),thresh(sec));
     end
     fprintf('complete.\n');
     save tmp.mat structs
