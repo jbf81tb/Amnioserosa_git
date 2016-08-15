@@ -18,9 +18,9 @@ sd1n = .5; sd1x = 3;
 m2n = 8; m2x = maxst;
 sd2n = .5; sd2x = 3;
 ngc = 8; %number grid cells
-frwin = 4;
+frwin = floor((ml-1)/2);
 vec = 0.5:(maxst+.5);
-fit_returns = zeros(ngc,ngc,ml-2*frwin,11);
+fit_returns = zeros(ngc,ngc,ml-(2*frwin+~mod(frwin,2)),11);
 figure
 cmap = colormap('jet');
 close
@@ -30,11 +30,13 @@ if show
     fh = figure('units','normalized','position',[0 0 1 1],'color','w');
     ah = tight_subplot(ngc,ngc,.005,[0 .02],.005);
 end
-mask = imread('E:\Josh\Matlab\cmeAnalysis_movies\new_amneo_movies\movies\160714_emb1_middle\Mask.tif');
+% mask = imread('E:\Josh\Matlab\cmeAnalysis_movies\new_amneo_movies\movies\160714_emb1_middle\Mask.tif');
 fname = 'tmp.tif';
 if exist(fname,'file'), delete(fname); end
-fprintf('Percent Complete: %3u%%',0);
-for fr = (frwin+1):floor(frwin/2):ml-frwin
+% fprintf('Percent Complete: %3u%%',0);
+ct = 1;
+frg = floor(frwin/2);
+for fr = (frwin+1):frg:ml-frwin
     xp = []; yp = []; zp = [];
     for i = 1:length(nsta)
         if ~any(nsta(i).frame==fr), continue; end
@@ -55,25 +57,27 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
             if show, axes(ah((i-1)*ngc+j)); end
             [hy,tmp] = histcounts(zp(cond),vec);
             hx = (tmp(1:end-1)+tmp(2:end))/2;
+            hx = double(hx);
+            hy = double(hy);
             [f, gof] = fit(hx',hy',F,...
                 'startpoint',[max(hy), 5, 1, mean(hy), max(hy)/2, 11, 1],...
                 'lower',[0,m1n,sd1n,0,0,m2n,sd2n],...
                 'upper',[1.5*max(hy),m1x,sd1x,max(hy),1.5*max(hy),m2x,sd2x]);
             tmpval = coeffvalues(f);
             rtvec = [tmpval gof.adjrsquare];
-            fit_returns(i,j,fr-frwin,1:length(rtvec)) = rtvec;
+            fit_returns(i,j,ct,1:length(rtvec)) = rtvec;
             
             c1 = tmpval(2); s1 = tmpval(3);
             start1 = max(1,round(c1-s1)); stop1 = min(length(hx),round(c1+s1));
             y_r1 = Fgaus(tmpval(1),tmpval(2),tmpval(3),start1:stop1);
             rsq1 = 1-SSE(y_r1,hy(start1:stop1))/SST(hy(start1:stop1));
-            fit_returns(i,j,fr-frwin,9) = max(rsq1,0);
+            fit_returns(i,j,ct,9) = max(rsq1,0);
             
             c2 = tmpval(6); s2 = tmpval(7);
             start2 = max(1,round(c2-s2)); stop2 = min(length(hx),round(c2+s2));
             y_r2 = Fgaus(tmpval(5),tmpval(6),tmpval(7),start2:stop2);
             rsq2 = 1-SSE(y_r2,hy(start2:stop2))/SST(hy(start2:stop2));
-            fit_returns(i,j,fr-frwin,10) = max(rsq2,0);
+            fit_returns(i,j,ct,10) = max(rsq2,0);
             
             if show
                 hold off
@@ -84,12 +88,12 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
                 plot(tmpx,F(tmpc{:},tmpx));
                 axis off
                 legend off
-                text(.1,.7,sprintf('%2.2f',fit_returns(i,j,fr-frwin,9)),...
+                text(.1,.7,sprintf('%2.2f',fit_returns(i,j,ct,9)),...
                     'Units','normalized','color','r')
-                text(.5,.7,sprintf('%2.2f',fit_returns(i,j,fr-frwin,10)),...
+                text(.5,.7,sprintf('%2.2f',fit_returns(i,j,ct,10)),...
                     'Units','normalized','color','b')
-                if fit_returns(i,j,fr-frwin,10)>.4 && hy(min(ceil(c2),length(hy)))/max(y_r2)>1.1
-                    fit_returns(i,j,fr-frwin,11)=1;
+                if fit_returns(i,j,ct,10)>.4 && hy(min(ceil(c2),length(hy)))/max(y_r2)>1.1
+                    fit_returns(i,j,ct,11)=1;
                 end
             end
         end
@@ -100,9 +104,10 @@ for fr = (frwin+1):floor(frwin/2):ml-frwin
     end
     frame = getframe(gcf);
     imwrite(frame.cdata,fname,'tif','writemode','append')
-    fprintf('\b\b\b\b%3u%%',ceil(100*fr/(ml-frwin)));
+    ct = ct+1;
+%     fprintf('\b\b\b\b%3u%%',ceil(100*fr/(ml-frwin)));
 end
-fprintf('\b\b\b\b%3u%%\n',100);
+% fprintf('\b\b\b\b%3u%%\n',100);
 close
 % for fr = 2:(ml-2*frwin)
 %     if all(reshape(fit_returns(:,:,fr,:),[],1)==0)

@@ -1,4 +1,4 @@
-an_win = 2:3;
+an_win = 5:6;
 omd = fullfile(pwd,'orig_movies');
 omdt = dir(fullfile(omd,'*.tif'));
 [~,ndt] = natsortfiles({omdt.name});
