@@ -36,15 +36,15 @@ for mov = 1:nm
     sta = cell(1,length(omdm)-1);
     for st = 1:length(omdm)-1
         if ~exist(fullfile(omd,omdm(ndt(st+1)).name),'file'), continue; end
-        vars = load(fullfile(omd,omdm(ndt(st+1)).name),'Threshfxyc');
-        sta{st} = fxyc_to_struct(vars.Threshfxyc,'w4s');
+        load(fullfile(omd,omdm(ndt(st+1)).name),'Threshfxyc');
+        sta{st} = fxyc_to_struct(Threshfxyc,'w4s');
     end
     nstac{mov} = combining_and_mixing(sta,mp_filename,framegap(mov),thresh(mov));
 end
 
 cnsta = cell(1,nm);
 for i = 1:nm
-    for j = 1:size(nstac{i});
+    for j = 1:length(nstac{i});
         cnsta{i} = [cnsta{i}, nstac{i}{j}];
     end
 end
