@@ -1,4 +1,4 @@
-function nsta = running_for_3Dt(exp_name,framegap,thresh)
+function cnsta = running_for_3Dt(exp_name,framegap,thresh)
 md = fullfile(exp_name,'movies');
 mdir = dir(fullfile(md,'*.tif'));
 [~,ndx] = natsortfiles({mdir.name});
@@ -35,19 +35,26 @@ for mov = 1:nm
 %         names{mov,st} = sprintf('%s, %s',mdir(ndx(mov)).name(end-8:end-4),omdm(ndt(st)).name);
     end
 end
+if length(framegap) == 1
+    framegap = framegap*ones(1,nm);
+end
+if length(thresh) == 1
+    thresh = thresh*ones(1,nm);
+end
 nstac = combining_and_mixing(sta,mp_filename,framegap,thresh);
-nsta = cell(1,nm);
+cnsta = cell(1,nm);
 for i = 1:nm
     for j = 1:size(nstac,2);
-        nsta{i} = [nsta{i}, nstac{i,j}];
+        cnsta{i} = [cnsta{i}, nstac{i,j}];
     end
 end
-for i = 1:length(nsta)
-    fnames = fieldnames(nsta{i});
-    for j = 1:length(nsta{i})
+for i = 1:length(cnsta)
+    fnames = fieldnames(cnsta{i});
+    for j = 1:length(cnsta{i})
         for k = 1:length(fnames)
-            nsta{i}(j).(fnames{k}) = single(nsta{i}(j).(fnames{k}));
+            cnsta{i}(j).(fnames{k}) = single(cnsta{i}(j).(fnames{k}));
         end
     end
 end
+save cnsta.mat cnsta
 end

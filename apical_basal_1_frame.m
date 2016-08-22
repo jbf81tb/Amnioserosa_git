@@ -61,12 +61,20 @@ for i = 1:ngc
         
 %         start1 = max(1,round(c1-s1)); 
         start1 = 1;
-        stop1 = min(length(hx),round(x01+s1*sqrt(2*log(A1/A3))));
+        if A1>A3
+            stop1 = min(length(hx),round(x01+s1*sqrt(2*log(A1/A3))));
+        else
+            stop1 = min(length(hx),round(x01+s1));
+        end
         y_r1 = Fgaus(A1,x01,s1,start1:stop1);
         rsq1 = 1-SSE(y_r1,hy(start1:stop1))/SST(hy(start1:stop1));
         fit_returns(i,j,9) = max(rsq1,0);
         
-        start2 = max(1,round(x02-s2*sqrt(2*log(A2/A3)))); 
+        if A2>A3
+            start2 = max(1,round(x02-s2*sqrt(2*log(A2/A3))));
+        else
+            start2 = max(1,round(x02-s2));
+        end
 %         stop2 = min(length(hx),round(x02+s2));
         stop2 = length(hx);
         y_r2 = Fgaus(A2,x02,s2,start2:stop2);
