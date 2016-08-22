@@ -11,9 +11,9 @@ if ~isstruct(structs{1,1})
     end
     fprintf('complete.\n');
 end
-structs = find_coincidences(structs,mov_sz);
 save tmp.mat structs
 for sec = 1:sst(1)
+    structs(sec,:) = find_coincidences_ps(structs(sec,:),mov_sz);
     nps = sum(~cellfun(@isempty,structs(sec,:)));
     ord = gen_ord(nps);
     for o = ord

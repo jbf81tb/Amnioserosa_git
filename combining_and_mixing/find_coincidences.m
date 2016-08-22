@@ -90,6 +90,7 @@ for sec = 1:sst(1)
             fprintf('\b\b\b\b%3i%%',ceil(100*((sec-1)*sst(2)*ml+(st-1)*ml+fr)/(sst(1)*sst(2)*ml)));
         end
     end
+    save tmp.mat structs
 end
 fprintf('\b\b\b\b%3i%%\n',100);
 end
