@@ -1,10 +1,12 @@
-an_win = 5:6;
+an_win = 3:4;
 omd = fullfile(pwd,'orig_movies');
 omdt = dir(fullfile(omd,'*.tif'));
 [~,ndt] = natsortfiles({omdt.name});
 mp_filename = 'proj.tif';
 if exist(mp_filename,'file'), delete(mp_filename); end
-for fr = 1:11
+
+ml = max(cellfun(@max,{nsta.frame}));
+for fr = 1:ml
     if fr == 1
         mov_sz = size(imread(fullfile(omd,omdt(1).name)));
     end
@@ -15,14 +17,18 @@ for fr = 1:11
     img = max(tmp,[],3);
     imwrite(img,mp_filename,'tif','writemode','append')
 end
-ml = max(cellfun(@max,{nsta.frame}));
 
 on = 'tmp.tif';
 if exist(on,'file'), delete(on); end
-for fr = 1:11
-    close
-    figure('units','pixels','position',[1 1 1100 1100])
-    axes('units','pixels','position',[10 10 1024 1024])
+close
+figure('units','pixels','position',[1 1 1100 1100])
+axes('units','pixels','position',[10 10 1024 1024])
+for fr = 1:ml
+    if mod(fr,100)==0
+        close
+        figure('units','pixels','position',[1 1 1100 1100])
+        axes('units','pixels','position',[10 10 1024 1024])
+    end
     img = imread(mp_filename,fr);
     imagesc(img);
     hold on
@@ -45,5 +51,6 @@ for fr = 1:11
     axis off
     F = getframe(gca,[1 1 1024 1024]);
     imwrite(F.cdata,on,'tif','writemode','append')
+    hold off
 end
 close

@@ -15,7 +15,7 @@ for fr = comb.trace(1).frame'
         num(j) = num(j) + 1;
     end
 end
-d = dist./num.^1.1>sqrt(2)|num<3;
+d = dist./num.^1.1>sqrt(5) | num<3;
 d(1) = false;
 comb.trace(d) = [];
 comb.lvl(d) = [];

@@ -38,7 +38,16 @@ for mov = 1:nm
         if ~exist(fullfile(omd,omdm(ndt(st+1)).name),'file'), continue; end
         load(fullfile(omd,omdm(ndt(st+1)).name),'Threshfxyc');
         sta{st} = fxyc_to_struct(Threshfxyc,'w4s');
+        sta{st}([sta{st}.lt]<3) = [];
     end
+%     sta = cell(1,length(omdm));
+%     for st = 1:length(omdm)
+%         if ~exist(fullfile(omd,omdm(ndt(st)).name),'file'), continue; end
+%         load(fullfile(omd,omdm(ndt(st)).name),'Threshfxyc');
+%         sta{st} = fxyc_to_struct(Threshfxyc,'w4s');
+%         sta{st}([sta{st}.lt]<3) = [];
+%     end
+
     nstac{mov} = combining_and_mixing(sta,mp_filename,framegap(mov),thresh(mov));
 end
 

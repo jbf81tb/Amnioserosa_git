@@ -41,7 +41,7 @@ for st = 1:nps
         for i = 1:length(xpos)
             if sum(isframe{fr}==i)
                 ind = find(frames{i}==fr);
-                %                     if mod(xpos{i}(ind),1)~=0||mod(ypos{i}(ind),1)~=0, continue; end
+                % if mod(xpos{i}(ind),1)~=0||mod(ypos{i}(ind),1)~=0, continue; end
                 allx = [allx xpos{i}(ind)]; %#ok<*AGROW>
                 ally = [ally ypos{i}(ind)];
                 pind = [pind pri(num_tr_st(st)+i)];
