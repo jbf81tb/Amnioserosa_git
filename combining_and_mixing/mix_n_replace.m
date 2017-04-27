@@ -1,5 +1,5 @@
 function structs = mix_n_replace(comb,n,o,s,structs,mov_sz)
-global ord
+global ord sec
 lct = length(comb.trace);
 ml = mov_sz(3);
 if lct == 1,
@@ -55,10 +55,10 @@ else
     set_ind = mode(ind);
     set_lvl = mode(lvl);
 end
-    structs{set_lvl}(set_ind) = mixed;
+    structs{sec,set_lvl}(set_ind) = mixed;
 for j = 1:lct
     if comb.ind(j)==set_ind && comb.lvl(j)==set_lvl, continue; end
-    structs{comb.lvl(j)}(comb.ind(j)) = struct(s{:});
+    structs{sec,comb.lvl(j)}(comb.ind(j)) = struct(s{:});
 end
 
 end
