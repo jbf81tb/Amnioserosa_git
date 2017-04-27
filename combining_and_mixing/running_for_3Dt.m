@@ -3,17 +3,7 @@ md = fullfile(exp_name,'movies');
 mdir = dir(fullfile(md,'*.tif'));
 [~,ndx] = natsortfiles({mdir.name});
 nm = length(mdir);
-<<<<<<< HEAD
 mp_filename = cell(1,nm);
-=======
-if length(framegap) == 1
-    framegap = framegap*ones(1,nm);
-end
-if length(thresh) == 1
-    thresh = thresh*ones(1,nm);
-end
-nstac = cell(nm,1);
->>>>>>> origin/master
 for mov = 1:nm
     mov_fol = fullfile(md,mdir(ndx(mov)).name(1:end-4));
     omd = fullfile(mov_fol,'orig_movies');
@@ -22,7 +12,7 @@ for mov = 1:nm
     lomdt = length(omdt);
     omdm = dir(fullfile(omd,'*.mat'));
     mlps = length(imfinfo(fullfile(omd,omdt(1).name)));
-    
+    if mov == 1, sta = cell(nm,lomdt); end %not perfect, mov 1 might not have all the zstacks
     
     mp_filename{mov} = [mov_fol filesep 'max_proj.tif'];
     if exist(mp_filename{mov},'file'), delete(mp_filename{mov}); end
@@ -37,7 +27,6 @@ for mov = 1:nm
         img = max(tmp,[],3);
         imwrite(img,mp_filename{mov},'tif','writemode','append')
     end
-<<<<<<< HEAD
 %     fprintf('%s\n',mdir(ndx(mov)).name)
     for st = 1:length(omdm)-2
         if ~exist(fullfile(omd,omdm(ndt(st+2)).name),'file'), continue; end
@@ -45,38 +34,13 @@ for mov = 1:nm
         sta{mov,st} = fxyc_to_struct(Threshfxyc,'no4s');
 %         fprintf('%s\n',omdm(ndt(st)).name)
 %         names{mov,st} = sprintf('%s, %s',mdir(ndx(mov)).name(end-8:end-4),omdm(ndt(st)).name);
-=======
-    sta = cell(1,length(omdm)-1);
-    for st = 1:length(omdm)-1
-        if ~exist(fullfile(omd,omdm(ndt(st+1)).name),'file'), continue; end
-        load(fullfile(omd,omdm(ndt(st+1)).name),'Threshfxyc');
-        sta{st} = fxyc_to_struct(Threshfxyc,'w4s');
-        sta{st}([sta{st}.lt]<3) = [];
->>>>>>> origin/master
     end
-%     sta = cell(1,length(omdm));
-%     for st = 1:length(omdm)
-%         if ~exist(fullfile(omd,omdm(ndt(st)).name),'file'), continue; end
-%         load(fullfile(omd,omdm(ndt(st)).name),'Threshfxyc');
-%         sta{st} = fxyc_to_struct(Threshfxyc,'w4s');
-%         sta{st}([sta{st}.lt]<3) = [];
-%     end
-
-    nstac{mov} = combining_and_mixing(sta,mp_filename,framegap(mov),thresh(mov));
 end
-<<<<<<< HEAD
 nstac = combining_and_mixing(sta,mp_filename,framegap,thresh);
 nsta = cell(1,nm);
 for i = 1:nm
     for j = 1:size(nstac,2);
         nsta{i} = [nsta{i}, nstac{i,j}];
-=======
-
-cnsta = cell(1,nm);
-for i = 1:nm
-    for j = 1:length(nstac{i});
-        cnsta{i} = [cnsta{i}, nstac{i}{j}];
->>>>>>> origin/master
     end
 end
 for i = 1:length(nsta)
