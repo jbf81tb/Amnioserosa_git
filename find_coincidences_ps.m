@@ -41,7 +41,7 @@ for st = 1:nps
         for i = 1:length(xpos)
             if sum(isframe{fr}==i)
                 ind = find(frames{i}==fr);
-                %                     if mod(xpos{i}(ind),1)~=0||mod(ypos{i}(ind),1)~=0, continue; end
+                % if mod(xpos{i}(ind),1)~=0||mod(ypos{i}(ind),1)~=0, continue; end
                 allx = [allx xpos{i}(ind)]; %#ok<*AGROW>
                 ally = [ally ypos{i}(ind)];
                 pind = [pind pri(num_tr_st(st)+i)];
@@ -87,7 +87,7 @@ for st = 1:nps
                 structs{st}(ind(2)).coin(1,fr_ind2) = ind(1);
             end
         end
-        fprintf('\b\b\b\b%3i%%',ceil(100*(sst*ml+(st-1)*ml+fr)/(sst*ml)));
+        fprintf('\b\b\b\b%3i%%',ceil(100*((st-1)*ml+fr)/(sst*ml)));
     end
 end
 save tmp.mat structs
