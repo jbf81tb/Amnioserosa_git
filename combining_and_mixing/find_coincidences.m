@@ -1,15 +1,14 @@
 function structs = find_coincidences(structs,mov_sz)
 sst = size(structs);
-ml = mov_sz(3);
-mask = cell([sst,ml]);
-ind_mask = cell([sst,ml]);
-pinds = cell([sst-[0,1],ml]);
 lst = cellfun(@length, structs);
-y_tot = mov_sz(1);
-x_tot = mov_sz(2);
 fprintf('Percent Complete (Coincidence Finding): %3i%%',0);
-
 for sec = 1:sst(1)
+    ml = mov_sz(3,sec);
+    mask = cell(sst(2),ml);
+    ind_mask = cell(sst(2),ml);
+    pinds = cell(sst(2)-1,ml);
+    y_tot = mov_sz(1,sec);
+    x_tot = mov_sz(2,sec);
     pri = primes((2*sum(lst(sec,:)))^(1.2));
     pri = pri(1:sum(lst(sec,:)));
     nps = sum(~cellfun(@isempty,structs(sec,:)));
@@ -47,29 +46,29 @@ for sec = 1:sst(1)
                     pind = [pind pri(num_tr_st(st)+i)];
                 end
             end
-            mask{sec,st,fr} = zeros(y_tot,x_tot);
-            ind_mask{sec,st,fr} = ones(y_tot,x_tot);
+            mask{st,fr} = zeros(y_tot,x_tot);
+            ind_mask{st,fr} = ones(y_tot,x_tot);
             if isempty(isframe{fr}), continue; end
             for i = 1:length(allx)
-                mask{sec,st,fr}(ceil(ally(i)),ceil(allx(i))) = 1;
-                ind_mask{sec,st,fr}(ceil(ally(i)),ceil(allx(i))) = pind(i);
+                mask{st,fr}(ceil(ally(i)),ceil(allx(i))) = 1;
+                ind_mask{st,fr}(ceil(ally(i)),ceil(allx(i))) = pind(i);
             end
-            B = bwboundaries(mask{sec,st,fr});
+            B = bwboundaries(mask{st,fr});
             sz = cellfun(@size,B,repmat({1},length(B),1));
             tmpi = find(sz>2);
             if ~isempty(tmpi)
                 for dum = 1:length(tmpi)
                     for dum2 = 2:length(B{tmpi(dum)}-1)
-                        mask{sec,st,fr}(B{tmpi(dum)}(dum2,1),B{tmpi(dum)}(dum2,2))=0;
-                        ind_mask{sec,st,fr}(B{tmpi(dum)}(dum2,1),B{tmpi(dum)}(dum2,2))=1;
+                        mask{st,fr}(B{tmpi(dum)}(dum2,1),B{tmpi(dum)}(dum2,2))=0;
+                        ind_mask{st,fr}(B{tmpi(dum)}(dum2,1),B{tmpi(dum)}(dum2,2))=1;
                     end
                 end
             end
-            mask{sec,st,fr} = conv2(mask{sec,st,fr},.25*[1,1,1;1,4,1;1,1,1],'same');
+            mask{st,fr} = conv2(mask{st,fr},.25*[1,1,1;1,4,1;1,1,1],'same');
             if st>1
-                img=ind_mask{sec,st-1,fr}.*ind_mask{sec,st,fr}.*(mask{sec,st-1,fr}+mask{sec,st,fr}>1);
+                img=ind_mask{st-1,fr}.*ind_mask{st,fr}.*(mask{st-1,fr}+mask{st,fr}>1);
                 B = bwboundaries(img,8,'noholes');
-                pinds{sec,st-1} = zeros(length(B),2);
+                pinds{st-1,fr} = zeros(length(B),2);
                 for i = 1:length(B)
                     if size(B{i},1)==2
                         tmp = sort(factor2(img(B{i}(1,1),B{i}(1,2)),pri));
@@ -78,9 +77,9 @@ for sec = 1:sst(1)
                     else
                         continue;
                     end
-                    pinds{sec,st-1,fr}(i,1) = find(tmp(1)==pri)-num_tr_st(st-1);
-                    pinds{sec,st-1,fr}(i,2) = find(tmp(2)==pri)-num_tr_st(st);
-                    ind = pinds{sec,st-1,fr}(i,:);
+                    pinds{st-1,fr}(i,1) = find(tmp(1)==pri)-num_tr_st(st-1);
+                    pinds{st-1,fr}(i,2) = find(tmp(2)==pri)-num_tr_st(st);
+                    ind = pinds{st-1,fr}(i,:);
                     fr_ind1 = structs{sec,st-1}(ind(1)).frame==fr;
                     fr_ind2 = structs{sec,st}(ind(2)).frame==fr;
                     structs{sec,st-1}(ind(1)).coin(2,fr_ind1) = ind(2);
@@ -90,7 +89,6 @@ for sec = 1:sst(1)
             fprintf('\b\b\b\b%3i%%',ceil(100*((sec-1)*sst(2)*ml+(st-1)*ml+fr)/(sst(1)*sst(2)*ml)));
         end
     end
-    save tmp.mat structs
 end
 fprintf('\b\b\b\b%3i%%\n',100);
 end

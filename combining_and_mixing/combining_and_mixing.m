@@ -1,6 +1,10 @@
 function structs = combining_and_mixing(structs,mp_filename,frame_length,thresh)
 global ord sec
-mov_sz = [size(imread(mp_filename)) length(imfinfo(mp_filename))];
+mov_sz = zeros(3,length(mp_filename));
+for i = 1:length(mp_filename)
+    mov_sz(:,i) = [size(imread(mp_filename{i})) length(imfinfo(mp_filename{i}))];
+end
+    
 sst = size(structs);
 if ~isstruct(structs{1,1})
     fprintf('Making structs... ');
@@ -11,9 +15,9 @@ if ~isstruct(structs{1,1})
     end
     fprintf('complete.\n');
 end
+structs = find_coincidences(structs,mov_sz);
 save tmp.mat structs
 for sec = 1:sst(1)
-    structs(sec,:) = find_coincidences_ps(structs(sec,:),mov_sz);
     nps = sum(~cellfun(@isempty,structs(sec,:)));
     ord = gen_ord(nps);
     for o = ord
@@ -32,13 +36,13 @@ for sec = 1:sst(1)
             end
             if isempty(comb.trace(1).frame), continue; end
             comb = clean_comb(comb);
-            structs = mix_n_replace(comb,n,o,s,structs,mov_sz);
+            structs = mix_n_replace(comb,n,o,s,structs,mov_sz(:,sec));
         end
         fprintf('mixed.\n');
     end
     save tmp.mat structs
     fprintf('Fixing self coincidence... ');
-    structs{sec, ord(end)} = find_and_fix_self_coincidence(structs{sec, ord(end)},mov_sz);
+    structs{sec, ord(end)} = find_and_fix_self_coincidence(structs{sec, ord(end)},mov_sz(:,sec));
     fprintf('complete.\n');
     save tmp.mat structs
     fprintf('Cleaning structs and finding slopes... ');
