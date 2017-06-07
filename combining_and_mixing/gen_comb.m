@@ -6,8 +6,7 @@ comb.trace(1) = fxyc{o}(i);
 comb.lvl(1) = o;
 comb.ind(1) = i;
 if isempty(fxyc{o}(i).coin), return; end
-matches{n} = unique(fxyc{o}(i).coin(swap(n),:));
-matches{n}(matches{n}==0) = [];
+matches{n} = nonzeros(unique(fxyc{o}(i).coin(swap(n),:)))';
 
 cmb_nm = 2;
 for k = 1:length(matches{n})

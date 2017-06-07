@@ -1,47 +1,77 @@
-function nsta = running_for_3Dt(exp_name,framegap,thresh)
+function cnsta = running_for_3Dt(exp_name,framegap,thresh,varargin)
+if nargin==4
+    redo = true;
+else
+    redo = false;
+end
+
 md = fullfile(exp_name,'movies');
 mdir = dir(fullfile(md,'*.tif'));
 [~,ndx] = natsortfiles({mdir.name});
 nm = length(mdir);
-mp_filename = cell(1,nm);
-for mov = 1:nm
+cnsta = cell(nm,1);
+if isscalar(framegap)
+    framegap = framegap*ones(nm,1);
+end
+if isscalar(thresh)
+    thresh = thresh*ones(nm,1);
+end
+if exist([exp_name filesep 'nsta.mat'],'file')
+    load([exp_name filesep 'nsta.mat']);
+    start = sum(~cellfun(@isempty,cnsta)) + 1;
+else
+    start = 1;
+end
+for mov = start:nm
     mov_fol = fullfile(md,mdir(ndx(mov)).name(1:end-4));
     omd = fullfile(mov_fol,'orig_movies');
     omdt = dir(fullfile(omd,'*.tif'));
+    nmat = length(dir(fullfile(omd,'*.mat')));
+    sta = cell(nmat,1);
     [~,ndt] = natsortfiles({omdt.name});
     lomdt = length(omdt);
-    omdm = dir(fullfile(omd,'*.mat'));
-    mlps = length(imfinfo(fullfile(omd,omdt(1).name)));
-    if mov == 1, sta = cell(nm,lomdt); end %not perfect, mov 1 might not have all the zstacks
-    
-    mp_filename{mov} = [mov_fol filesep 'max_proj.tif'];
-    if exist(mp_filename{mov},'file'), delete(mp_filename{mov}); end
-    for fr = 1:mlps
-        if fr == 1
-            mov_sz = size(imread(fullfile(omd,omdt(1).name)));
+    disp('KEEPING FIRST STACK')
+    st = 1; i = 1;
+    while st <= lomdt
+        if ~exist(fullfile(omd,[omdt(ndt(st)).name(1:end-4) '.mat']),'file')
+            st = st+1;
+            continue;
         end
-        tmp = zeros([mov_sz lomdt],'uint16');
-        for zi = 1:lomdt
-            tmp(:,:,zi) = imread(fullfile(omd,omdt(ndt(zi)).name),fr);
+        load(fullfile(omd,[omdt(ndt(st)).name(1:end-4) '.mat']),'Threshfxyc');
+        sta{i} = fxyc_to_struct(Threshfxyc,'no4s');
+        st = st+1; i = i+1;
+    end
+    mp_filename = [mov_fol filesep 'max_proj.tif'];
+    if redo || ~exist(mp_filename,'file')
+        if exist(mp_filename,'file'), delete(mp_filename); end
+        mlps = length(imfinfo(fullfile(omd,omdt(1).name)));
+        for fr = 1:mlps
+            if fr == 1
+                fr_sz = size(imread(fullfile(omd,omdt(1).name)));
+            end
+            tmp = zeros([fr_sz lomdt],'uint16');
+            for zi = 1:lomdt
+                tmp(:,:,zi) = imread(fullfile(omd,omdt(ndt(zi)).name),fr);
+            end
+            img = max(tmp,[],3);
+            imwrite(img,mp_filename,'tif','writemode','append')
         end
-        img = max(tmp,[],3);
-        imwrite(img,mp_filename{mov},'tif','writemode','append')
     end
-%     fprintf('%s\n',mdir(ndx(mov)).name)
-    for st = 1:length(omdm)
-        if ~exist(fullfile(omd,omdm(ndt(st)).name),'file'), continue; end
-        load(fullfile(omd,omdm(ndt(st)).name),'Threshfxyc');
-        sta{mov,st} = fxyc_to_struct(Threshfxyc,'no4s');
-    end
+    mov_sz = [size(imread(mp_filename)) length(imfinfo(mp_filename))];
+    cnsta{mov} = combining_and_mixing(sta,mov_sz,framegap(mov),thresh(mov));
+    save([exp_name filesep 'nsta.mat'],'cnsta','-v7.3');
 end
-nstac = combining_and_mixing(sta,mp_filename,framegap,thresh);
-nsta = cell(1,nm);
-for i = 1:nm
-    for j = 1:size(nstac,2);
-        nsta{i} = [nsta{i}, nstac{i,j}];
+
+nsta = cell(nm,1);
+for i = 1:length(cnsta)
+    for j = 1:length(cnsta{i})
+        nsta{i} = [nsta{i} cnsta{i}{j}];
     end
-end
+end  
+
 for i = 1:length(nsta)
+    tmp = cellfun(@isempty,{nsta{i}.frame});
+    nsta{i}(tmp) = [];
     fnames = fieldnames(nsta{i});
     for j = 1:length(nsta{i})
         for k = 1:length(fnames)
@@ -49,4 +79,5 @@ for i = 1:length(nsta)
         end
     end
 end
+save([exp_name filesep 'nsta.mat'],'nsta','-v7.3');
 end

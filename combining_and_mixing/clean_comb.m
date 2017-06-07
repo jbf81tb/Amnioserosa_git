@@ -6,7 +6,7 @@ for fr = comb.trace(1).frame'
     ind1 = find(comb.trace(1).frame==fr);
     x1 = comb.trace(1).xpos(ind1);
     y1 = comb.trace(1).ypos(ind1);
-    for j = 1:length(comb.trace)
+    for j = 2:length(comb.trace)
         ind = find(comb.trace(j).frame==fr);
         if isempty(ind), continue; end
         x2 = comb.trace(j).xpos(ind);
@@ -15,7 +15,7 @@ for fr = comb.trace(1).frame'
         num(j) = num(j) + 1;
     end
 end
-d = dist./num.^1.1>sqrt(5) | num<3;
+d = (dist./(num.^1.1))>sqrt(5) | num<3;
 d(1) = false;
 comb.trace(d) = [];
 comb.lvl(d) = [];
