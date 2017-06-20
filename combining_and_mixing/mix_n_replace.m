@@ -9,6 +9,7 @@ if lct == 1,
 else
 %     mixed = struct('frame',[],'xpos',[],'ypos',[],'class',0,'int',[],'lt',0,'coin',[],'st',[]);
     mixed = struct(s{:});
+    mixed.class=0;
     lvl = []; ind = [];
     l = 1;
     for fr = 1:ml
@@ -58,7 +59,7 @@ else
 end
     structs{set_lvl}(set_ind) = mixed;
 for j = 1:lct
-    if comb.ind(j)==set_ind && comb.lvl(j)==set_lvl, continue; end
+    if comb.lvl(j)==set_lvl && comb.ind(j)==set_ind, continue; end
     structs{comb.lvl(j)}(comb.ind(j)) = struct(s{:});
 end
 

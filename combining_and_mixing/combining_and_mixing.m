@@ -32,7 +32,7 @@ fprintf('Fixing self coincidence... ');
 structs{ord(end)} = find_and_fix_self_coincidence(structs{ord(end)},mov_sz);
 fprintf('complete.\n');
 save .\tmp.mat structs
-fprintf('Cleaning structs and finding slopes... ');
+fprintf('Finding slopes... ');
 for st = 1:nps
     structs{st} = slope_finding(structs{st},frame_length,thresh);
 end

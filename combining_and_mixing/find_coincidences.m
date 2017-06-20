@@ -5,8 +5,8 @@ lst = cellfun(@length, structs);
 fprintf('Percent Complete (Coincidence Finding): %3i%%',0);
 
 ml = mov_sz(3);
-mask = cell(2);
-ind_mask = cell(2);
+mask = cell(2,1);
+ind_mask = cell(2,1);
 % pinds = cell(nps-1,ml);
 [xpos, ypos, frames, inds] = deal(cell(nps,1));
 y_tot = mov_sz(1);
@@ -33,12 +33,13 @@ end
     
 for fr = 1:ml
     for st = 1:nps
-        allx = xpos{st}(frames{st}==fr);
-        ally = ypos{st}(frames{st}==fr);
-        pind = pri(num_tr_st(st)+inds{st}(frames{st}==fr));
         mask{keep(st)} = zeros(y_tot,x_tot);
         ind_mask{keep(st)} = ones(y_tot,x_tot);
         if ~any(frames{st}==fr), continue; end
+        
+        allx = xpos{st}(frames{st}==fr);
+        ally = ypos{st}(frames{st}==fr);
+        pind = pri(num_tr_st(st)+inds{st}(frames{st}==fr));
         
         mask{keep(st)}(sub2ind([y_tot,x_tot],ceil(ally),ceil(allx))) = 1;
         ind_mask{keep(st)}(sub2ind([y_tot,x_tot],ceil(ally),ceil(allx))) = pind;

@@ -1,4 +1,4 @@
-function cnsta = running_for_3Dt(exp_name,framegap,thresh,varargin)
+function nsta = running_for_3Dt(exp_name,framegap,thresh,varargin)
 if nargin==4
     redo = true;
 else
@@ -30,6 +30,7 @@ for mov = start:nm
     sta = cell(nmat,1);
     [~,ndt] = natsortfiles({omdt.name});
     lomdt = length(omdt);
+    if lomdt==1, continue; end
     disp('KEEPING FIRST STACK')
     st = 1; i = 1;
     while st <= lomdt
@@ -38,7 +39,7 @@ for mov = start:nm
             continue;
         end
         load(fullfile(omd,[omdt(ndt(st)).name(1:end-4) '.mat']),'Threshfxyc');
-        sta{i} = fxyc_to_struct(Threshfxyc,'no4s');
+        sta{i} = fxyc_to_struct(Threshfxyc,'w4s');
         st = st+1; i = i+1;
     end
     mp_filename = [mov_fol filesep 'max_proj.tif'];
@@ -62,10 +63,17 @@ for mov = start:nm
     save([exp_name filesep 'nsta.mat'],'cnsta','-v7.3');
 end
 
-nsta = cell(nm,1);
+nsta = cell(sum(~cellfun(@isempty,cnsta)),1);
+
 for i = 1:length(cnsta)
-    for j = 1:length(cnsta{i})
+    j = 1;
+    while j <= length(cnsta{i})
+        if isempty(cnsta{i}{j})
+            j = j+1;
+            continue;
+        end
         nsta{i} = [nsta{i} cnsta{i}{j}];
+        j = j+1;
     end
 end  
 

@@ -30,7 +30,6 @@ for k = 1:length(matches{swap(n)})
     cmb_nm = cmb_nm + 1;
 end
 
-
 lm = cellfun(@length,matches);
 which_o = [o, look(n,o)];
 while true
@@ -42,7 +41,7 @@ while true
     matches{n}(matches{n}==0|matches{n}==i) = [];
     if length(matches{n})==lm(n), break; end
     for k = 1:length(matches{n})
-        if sum(comb.lvl==which_o(which_o~=o)&comb.ind==matches{n}(k)), continue; end
+        if any(comb.lvl==which_o(which_o~=o)&comb.ind==matches{n}(k)), continue; end
         comb.trace(cmb_nm) = fxyc{which_o(which_o~=o)}(matches{n}(k));
         comb.lvl(cmb_nm) = which_o(which_o~=o);
         comb.ind(cmb_nm) = matches{n}(k);
@@ -51,6 +50,5 @@ while true
     lm = cellfun(@length,matches);
     o = which_o(which_o~=o);
     n = swap(n);
-    
 end
 end
