@@ -7,7 +7,6 @@ if lct == 1,
     lvl = ones(length(comb.trace.frame),1)*comb.lvl;
     ind = ones(length(comb.trace.frame),1)*comb.ind;
 else
-%     mixed = struct('frame',[],'xpos',[],'ypos',[],'class',0,'int',[],'lt',0,'coin',[],'st',[]);
     mixed = struct(s{:});
     mixed.class=0;
     lvl = []; ind = [];
@@ -23,8 +22,8 @@ else
                 int(2) = j;
                 int(3) = fr_ind;
             end
-            rI = rI + comb.trace(j).st(fr_ind)*comb.trace(j).int(fr_ind);
-            I = I + comb.trace(j).int(fr_ind);
+            rI = rI + comb.trace(j).st(fr_ind)*comb.trace(j).int(fr_ind)*comb.trace(j).weight(fr_ind);
+            I = I + comb.trace(j).int(fr_ind)*comb.trace(j).weight(fr_ind);
         end
         if int(1) == 0, continue; end
         mixed.frame(l) = fr;
@@ -32,6 +31,7 @@ else
         mixed.xpos(l) = comb.trace(int(2)).xpos(int(3));
         mixed.ypos(l) = comb.trace(int(2)).ypos(int(3));
         mixed.st(l) = rI/I;
+        mixed.weight(l) = I/int(1);
         lvl(l) = comb.lvl(int(2)); %#ok<AGROW>
         ind(l) = comb.ind(int(2)); %#ok<AGROW>
         if isempty(comb.trace(int(2)).coin), continue; end
@@ -48,6 +48,7 @@ else
     mixed.xpos = mixed.xpos';
     mixed.ypos = mixed.ypos';
     mixed.st = mixed.st';
+    mixed.weight = mixed.weight';
     mixed.lt = mixed.frame(end)-mixed.frame(1)+1;
 end
 if any(lvl==look(n,o))

@@ -1,4 +1,4 @@
-st = 3;
+st = 4;
 an_win = st:st+1;
 omd = fullfile(pwd,'orig_movies');
 omdt = dir(fullfile(omd,'*.tif'));

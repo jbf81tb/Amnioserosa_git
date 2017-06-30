@@ -1,5 +1,5 @@
-st = 2;
-an_win = [st st+2];
+st = 4;
+an_win = [st st+1];
 omd = fullfile(pwd,'orig_movies');
 omdt = dir(fullfile(omd,'*.mat'));
 [~,ndt] = natsortfiles({omdt.name});
@@ -35,8 +35,8 @@ for fr = 1:ml
         frind = find(st1(i).frame==fr);
         if isempty(frind), continue; end
         cls = st1(i).class;
-        col(end+1,:) = [cls<4,...
-                        cls==5||cls==6,...
+        col(end+1,:) = [cls<=6&&cls~=4,...
+                        0,...
                         (cls==4||cls==7||cls==8)];
         xp(end+1) = st1(i).xpos(frind);
         yp(end+1) = st1(i).ypos(frind);
@@ -59,8 +59,8 @@ for fr = 1:ml
         frind = find(st2(i).frame==fr);
         if isempty(frind), continue; end
         cls = st2(i).class;
-        col(end+1,:) = [cls<4,...
-                        cls==5||cls==6,...
+        col(end+1,:) = [cls<=6&&cls~=4,...
+                        0,...
                         (cls==4||cls==7||cls==8)];
         xp(end+1) = st2(i).xpos(frind);
         yp(end+1) = st2(i).ypos(frind);

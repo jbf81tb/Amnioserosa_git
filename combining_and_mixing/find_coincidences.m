@@ -21,6 +21,7 @@ for st = 1:nps
     for i = 1:lst(st)
         structs{st}(i).coin = zeros(2,length(structs{st}(i).frame));
         structs{st}(i).st = st*ones(length(structs{st}(i).frame),1);
+        structs{st}(i).weight = zeros(size(structs{st}(i).frame));
     end
     
     xpos{st} = cell2mat({structs{st}.xpos}');
@@ -76,7 +77,9 @@ for fr = 1:ml
                 fr_ind1 = structs{st-1}(ind(1)).frame==fr;
                 fr_ind2 = structs{st}(ind(2)).frame==fr;
                 structs{st-1}(ind(1)).coin(2,fr_ind1) = ind(2);
+                structs{st-1}(ind(1)).weight(fr_ind1) = 1;
                 structs{st}(ind(2)).coin(1,fr_ind2) = ind(1);
+                structs{st}(ind(2)).weight(fr_ind2) = 1;
             end
         end
     end
