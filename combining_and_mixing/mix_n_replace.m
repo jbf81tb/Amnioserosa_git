@@ -13,10 +13,13 @@ else
     l = 1;
     for fr = 1:ml
         int = [0, 0, 0];
-        rI = 0; I = 0;
+        rI = 0; I = 0; count = 0;
         for j = 1:lct
             fr_ind = find(comb.trace(j).frame == fr);
             if isempty(fr_ind), continue; end
+%             if any(comb.trace(j).weight>0) && ~all(comb.trace(j).weight>0)
+%                 comb.trace(j).weight(comb.trace(j).weight==0) = 1;
+%             end
             if comb.trace(j).int(fr_ind) > int(1)
                 int(1) = comb.trace(j).int(fr_ind);
                 int(2) = j;
