@@ -75,7 +75,7 @@ for i = 1:length(cnsta)
         nsta{i} = [nsta{i} cnsta{i}{j}];
         j = j+1;
     end
-end  
+end
 
 for i = 1:length(nsta)
     tmp = cellfun(@isempty,{nsta{i}.frame});

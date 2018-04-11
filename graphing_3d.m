@@ -3,7 +3,7 @@ for i = 1:length(nsta)
     nstca = [nstca, nsta{i}];
 end
 %%
-mov_nm = 'E:\Josh\Matlab\cmeAnalysis_movies\new_amneo_movies\movies\160714_emb2_late\apical_proj.tif';
+mov_nm = 'F:\tmp_diagnose_3d_tracking\confluence\movies\con_cell006\max_proj.tif';
 mov_sz = [size(imread(mov_nm)), length(imfinfo(mov_nm))];
 %%
 cond = apical;
@@ -14,7 +14,7 @@ max_int = max(cellfun(@max,cellfun(@single,{nstca.int},'UniformOutput',false)));
 max_st = max(cellfun(@max,cellfun(@single,{nstca.st},'UniformOutput',false)));
 max_lt = max([nstca.lt]);
 ml = max(cellfun(@max,cellfun(@single,{nstca.frame},'UniformOutput',false)));
-
+rainbow_colormap;
 cmap = rainbow;
 % figure
 % cmap = colormap('jet');
