@@ -6,7 +6,19 @@ else
 end
 
 md = fullfile(exp_name,'movies');
-mdir = dir(fullfile(md,'*.tif'));
+tmpd = dir(md);
+tmp_mdir = dir(fullfile(md,'*.tif'));
+mdir = [];
+for i = 1:length(tmp_mdir)
+    for j = 1:length(tmpd)
+        if contains(tmpd(j).name, tmp_mdir(i).name(1:end-4))
+            if ~endsWith(tmpd(j).name, '.tif')
+                mdir = [mdir tmpd(j)];
+            end
+        end
+    end
+end
+            
 [~,ndx] = natsortfiles({mdir.name});
 nm = length(mdir);
 cnsta = cell(nm,1);
@@ -23,7 +35,7 @@ else
     start = 1;
 end
 for mov = start:nm
-    mov_fol = fullfile(md,mdir(ndx(mov)).name(1:end-4));
+    mov_fol = fullfile(md,mdir(ndx(mov)).name);
     omd = fullfile(mov_fol,'orig_movies');
     omdt = dir(fullfile(omd,'*.tif'));
     nmat = length(dir(fullfile(omd,'*.mat')));
